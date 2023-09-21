@@ -1,0 +1,8 @@
+.errors-block {
+    display: none;
+    padding: 5px;
+    border: 1px solid red;
+    font-size: 16px;
+    margin-bottom: 10px;
+    width: 500px;
+}

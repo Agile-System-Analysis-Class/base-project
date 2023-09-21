@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:latest
+    ports:
+      - "3306:3306"
+    env_file:
+      - ./.mysql.env
+    networks:
+      - deploy_fast_api_project
+    expose:
+        - "3306"
+  web:
+    build: .
+    command: uvicorn main:app --host 0.0.0.0
+    volumes:
+      - ./app:/app
+    ports:
+      - 8000:8000
+    networks:
+      - deploy_fast_api_project
+    env_file:
+      - ./.env
+    restart: unless-stopped
+    depends_on:
+      - db
+
+networks:
+  deploy_fast_api_project:
+      driver: bridge
