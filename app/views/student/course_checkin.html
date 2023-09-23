@@ -1,0 +1,18 @@
+{% extends 'templates/base.html' %}
+{% block content %}
+
+{% include 'templates/nav.html' %}
+
+<h2>Welcome to your course: <a href="/student/course/{{ course.id }}">{{ course.name }}</a></h2>
+
+<h3>Use access code to check-in to your course</h3>
+
+<div>
+    <div>
+        <label for="access_code">Access Code</label>
+        <input type="text" name="access_code" />
+        <button onclick="alert('not implemented')">Attend Class</button>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'templates/base.html' %}
+{% block content %}
+
+{% include 'templates/nav.html' %}
+
+<h2>Welcome to your course: {{ course.name }}</h2>
+
+[<a href="/student/course/{{ course.id }}/checkin">Verify Attendance</a>]
+
+<h3>Current Attendance</h3>
+<table border="1px">
+    <tr>
+        <th width="5%">#</th>
+        <th width="5%">Date</th>
+        <th>Attended Class</th>
+    </tr>
+    <tr>
+        <td colspan="3"><em>Not implemented</em></td>
+    </tr>
+</table>
+
+{% endblock %}

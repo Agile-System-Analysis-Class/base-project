@@ -10,7 +10,7 @@ from starlette.templating import Jinja2Templates
 
 import services.database
 from services.user_helper import get_user
-from services.course_helper import filter_courses, get_course, teaches_course, course_students
+from services.course_helper import filter_courses, get_course, course_exists, course_students
 from sessions.auth_session_data import AuthSessionData
 from sessions.auth_verifier import AuthVerifier
 from sessions.authenticate import Authenticate
@@ -25,6 +25,7 @@ user_data = [
     {"id": 1, "name": "root", "email": "root", "is_student": False},
     {"id": 2, "name": "Teacher", "email": "teacher@my.stlcc.edu", "is_student": False},
     {"id": 3, "name": "Student", "email": "student@my.stlcc.edu", "is_student": True},
+    {"id": 4, "name": "Student 2", "email": "student2@my.stlcc.edu", "is_student": True},
 ]
 
 course_data = [
@@ -43,6 +44,7 @@ student_course_data = [
     {"id": 1, "course_id": 1, "student_id": 3},
     {"id": 2, "course_id": 2, "student_id": 3},
     {"id": 3, "course_id": 3, "student_id": 3},
+    {"id": 4, "course_id": 1, "student_id": 4},
 ]
 
 # setup session + backend cookies
@@ -137,8 +139,6 @@ async def logout(
 async def teacher_course(
     cid: int,
     request: Request,
-    response: Response,
-    session_id: UUID = Depends(cookie),
     sess: AuthSessionData = Depends(verifier)
 ):
     if not sess:
@@ -148,7 +148,7 @@ async def teacher_course(
     current = get_course(cid, course_data)
     teaches = filter_courses(sess.id, teacher_course_data, course_data, 1)
 
-    if not teaches_course(current, teaches):
+    if not course_exists(current, teaches):
         return RedirectResponse("/login")
 
     students = course_students(current, student_course_data, user_data)
@@ -164,8 +164,6 @@ async def teacher_access_code(
     cid: int,
     uid: int,
     request: Request,
-    response: Response,
-    session_id: UUID = Depends(cookie),
     sess: AuthSessionData = Depends(verifier)
 ):
     if not sess:
@@ -175,7 +173,7 @@ async def teacher_access_code(
     current = get_course(cid, course_data)
     teaches = filter_courses(sess.id, teacher_course_data, course_data, 1)
 
-    if not teaches_course(current, teaches):
+    if not course_exists(current, teaches):
         return RedirectResponse("/login")
 
     student = get_user(uid, user_data)
@@ -188,6 +186,51 @@ async def teacher_access_code(
         "student": student
     })
 
+
+@app.get('/student/course/{cid}', dependencies=[Depends(cookie)])
+async def student_course(
+    cid: int,
+    request: Request,
+    sess: AuthSessionData = Depends(verifier)
+):
+    if not sess:
+        return RedirectResponse("/login")
+
+    # todo convert this to db
+    current = get_course(cid, course_data)
+    attends = filter_courses(sess.id, student_course_data, course_data, 2)
+
+    if not course_exists(current, attends):
+        return RedirectResponse("/login")
+
+    return templates.TemplateResponse("student/course.html", {
+        "request": request,
+        "course": current,
+    })
+
+
+@app.get('/student/course/{cid}/checkin', dependencies=[Depends(cookie)])
+async def student_course_checkin(
+    cid: int,
+    request: Request,
+    sess: AuthSessionData = Depends(verifier)
+):
+    if not sess:
+        return RedirectResponse("/login")
+
+    # todo convert this to db
+    current = get_course(cid, course_data)
+    attends = filter_courses(sess.id, student_course_data, course_data, 2)
+
+    if not course_exists(current, attends):
+        return RedirectResponse("/login")
+
+    # todo: when we add actual data we need to tell the js when the class started when the page loads
+
+    return templates.TemplateResponse("student/course_checkin.html", {
+        "request": request,
+        "course": current,
+    })
 # dummy code below
 
 

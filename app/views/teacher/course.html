@@ -13,13 +13,13 @@
         <th>Student Name</th>
     </tr>
     {% if students %}
-    <tr>
     {% for student in students %}
+    <tr>
         <td align="center"><input type="checkbox" /></td>
         <td><a href="/teacher/course/{{ course.id }}/access_code/{{ student.id }}">Access Code</a></td>
         <td>{{ student.name }}</td>
-    {% endfor %}
     </tr>
+    {% endfor %}
     {% else %}
     <tr>
         <td colspan="3"><em>No users registered</em></td>

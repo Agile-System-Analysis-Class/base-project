@@ -24,7 +24,7 @@ def get_course(id: int, courses: list[dict]):
             return course
     return None
 
-def teaches_course(current: dict, courses: list[dict]):
+def course_exists(current: dict, courses: list[dict]):
     for course in courses:
         if current.get("id") == course.get("id"):
             return True
