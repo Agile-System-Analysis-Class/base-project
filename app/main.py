@@ -9,7 +9,8 @@ from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
 import services.database
-from services.course_helper import filter_courses
+from services.user_helper import get_user
+from services.course_helper import filter_courses, get_course, teaches_course, course_students
 from sessions.auth_session_data import AuthSessionData
 from sessions.auth_verifier import AuthVerifier
 from sessions.authenticate import Authenticate
@@ -21,9 +22,9 @@ templates = Jinja2Templates(directory="views")
 
 # setup dummy data
 user_data = [
-    {"id": 1, "name": "root", "is_student": False},
-    {"id": 2, "name": "teacher@my.stlcc.edu", "is_student": False},
-    {"id": 3, "name": "student@my.stlcc.edu", "is_student": True},
+    {"id": 1, "name": "root", "email": "root", "is_student": False},
+    {"id": 2, "name": "Teacher", "email": "teacher@my.stlcc.edu", "is_student": False},
+    {"id": 3, "name": "Student", "email": "student@my.stlcc.edu", "is_student": True},
 ]
 
 course_data = [
@@ -103,7 +104,7 @@ def login_page(request: Request, session_data: AuthSessionData = Depends(verifie
 @app.post("/login", dependencies=[Depends(cookie)])
 async def login_page(
     response: Response,
-    username: Annotated[str, Form()],
+    email: Annotated[str, Form()],
     password: Annotated[str, Form()],
     session_data: AuthSessionData = Depends(verifier)
 ):
@@ -113,9 +114,9 @@ async def login_page(
 
     # loop through fake data and check if user exists, no PW matching
     for user in user_data:
-        if user["name"] == username:
+        if user["email"] == email:
             auth = Authenticate(response, session, cookie)
-            await auth.session_create(user["id"], user["name"], user["is_student"])
+            await auth.session_create(user["id"], user["email"], user["name"], user["is_student"])
             return {"status": True, "message": "Logged in successfully!"}
     return {"status": False, "message": "Login failed, please try again!"}
 
@@ -130,6 +131,63 @@ async def logout(
         await session.delete(session_id)
         cookie.delete_from_response(response)
     return RedirectResponse("/login")
+
+
+@app.get('/teacher/course/{cid}', dependencies=[Depends(cookie)])
+async def teacher_course(
+    cid: int,
+    request: Request,
+    response: Response,
+    session_id: UUID = Depends(cookie),
+    sess: AuthSessionData = Depends(verifier)
+):
+    if not sess:
+        return RedirectResponse("/login")
+
+    # todo convert this to db
+    current = get_course(cid, course_data)
+    teaches = filter_courses(sess.id, teacher_course_data, course_data, 1)
+
+    if not teaches_course(current, teaches):
+        return RedirectResponse("/login")
+
+    students = course_students(current, student_course_data, user_data)
+
+    return templates.TemplateResponse("teacher/course.html", {
+        "request": request,
+        "course": current,
+        "students": students
+    })
+
+@app.get('/teacher/course/{cid}/access_code/{uid}', dependencies=[Depends(cookie)])
+async def teacher_access_code(
+    cid: int,
+    uid: int,
+    request: Request,
+    response: Response,
+    session_id: UUID = Depends(cookie),
+    sess: AuthSessionData = Depends(verifier)
+):
+    if not sess:
+        return RedirectResponse("/login")
+
+    # todo convert this to db
+    current = get_course(cid, course_data)
+    teaches = filter_courses(sess.id, teacher_course_data, course_data, 1)
+
+    if not teaches_course(current, teaches):
+        return RedirectResponse("/login")
+
+    student = get_user(uid, user_data)
+    if not student:
+        return RedirectResponse(f'/teacher/course/{uid}')
+
+    return templates.TemplateResponse("teacher/generate_access_code.html", {
+        "request": request,
+        "course": current,
+        "student": student
+    })
+
 # dummy code below
 
 

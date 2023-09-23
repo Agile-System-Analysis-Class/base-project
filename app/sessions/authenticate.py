@@ -17,9 +17,9 @@ class Authenticate:
         self.backend = backend
         self.response = response
 
-    async def session_create(self, _id: int, username: str, is_student: bool = False):
+    async def session_create(self, _id: int, email: str, username: str, is_student: bool = False):
         uniq = uuid4()
-        data = AuthSessionData(id=_id, username=username, is_student=is_student)
+        data = AuthSessionData(id=_id, username=username, email=email, is_student=is_student)
 
         await self.backend.create(uniq, data)
         self.cookie.attach_to_response(self.response, uniq)
