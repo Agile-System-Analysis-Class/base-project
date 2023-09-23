@@ -1,0 +1,18 @@
+{% extends 'templates/base.html' %}
+{% block content %}
+<h2>Welcome to the Student Dashboard</h2>
+
+<h3>Courses</h3>
+
+<ul>
+    {% for course in courses %}
+    <li><a href="/student/course/{{ course.id }}">{{ course.name }}</a></li>
+    {% endfor %}
+</ul>
+
+<h3>Navigation</h3>
+
+<ul>
+    <ul><a href="/logout">Logout</a></ul>
+</ul>
+{% endblock %}

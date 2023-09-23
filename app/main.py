@@ -1,5 +1,5 @@
 from typing import Union, Annotated
-from uuid import uuid4, UUID
+from uuid import UUID
 
 from fastapi import FastAPI, Request, Form, Response, Depends, HTTPException
 from fastapi_sessions.backends.implementations import InMemoryBackend
@@ -9,6 +9,7 @@ from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
 import services.database
+from services.course_helper import filter_courses
 from sessions.auth_session_data import AuthSessionData
 from sessions.auth_verifier import AuthVerifier
 from sessions.authenticate import Authenticate
@@ -18,10 +19,29 @@ db = services.database.conn()
 # templates ob ject
 templates = Jinja2Templates(directory="views")
 
-# example user data
-fake_data = [
-    {"name": "lharris261@my.stlcc.edu", "password": "", "is_student": True},
-    {"name": "root", "password": "", "is_student": False},
+# setup dummy data
+user_data = [
+    {"id": 1, "name": "root", "is_student": False},
+    {"id": 2, "name": "teacher@my.stlcc.edu", "is_student": False},
+    {"id": 3, "name": "student@my.stlcc.edu", "is_student": True},
+]
+
+course_data = [
+    {"id": 1, "name": "Systems Analysis and Design", "course_id": 241210, "course_code": "is"},
+    {"id": 2, "name": "Graphics for the Web", "course_id": 141230, "course_code": "is"},
+    {"id": 3, "name": "Introductory Statistics", "course_id": 180511, "course_code": "mth"},
+]
+
+teacher_course_data = [
+    {"id": 1, "course_id": 1, "teacher_id": 1},
+    {"id": 2, "course_id": 2, "teacher_id": 2},
+    {"id": 3, "course_id": 3, "teacher_id": 2},
+]
+
+student_course_data = [
+    {"id": 1, "course_id": 1, "student_id": 3},
+    {"id": 2, "course_id": 2, "student_id": 3},
+    {"id": 3, "course_id": 3, "student_id": 3},
 ]
 
 # setup session + backend cookies
@@ -52,13 +72,27 @@ app = FastAPI()
 app.mount("/assets", StaticFiles(directory="assets"), name="assets")
 
 
+# Setup student/teacher dashboards
 @app.get("/", response_class=HTMLResponse, dependencies=[Depends(cookie)])
-def home_page(request: Request, session_data: AuthSessionData = Depends(verifier)):
-    if not session_data:
+def home_page(request: Request, sess: AuthSessionData = Depends(verifier)):
+    if not sess:
         return RedirectResponse("/login")
-    return templates.TemplateResponse("index.html", {"request": request, "data": fake_data})
+
+    temp = "teacher.html"
+    courses = teacher_course_data
+    course_type = 1
+    if sess.is_student:
+        temp = "student.html"
+        courses = student_course_data
+        course_type = 2;
+
+    # grab correct course data for teacher vs student
+    cdata = filter_courses(sess.id, courses, course_data, course_type)
+
+    return templates.TemplateResponse(f"dashboard/{temp}", {"request": request, "courses": cdata})
 
 
+# Setup authentication routes
 @app.get("/login", response_class=HTMLResponse, dependencies=[Depends(cookie)])
 def login_page(request: Request, session_data: AuthSessionData = Depends(verifier)):
     if session_data:
@@ -78,10 +112,10 @@ async def login_page(
         return {"status": True, "message": "already logged in"}
 
     # loop through fake data and check if user exists, no PW matching
-    for user in fake_data:
+    for user in user_data:
         if user["name"] == username:
             auth = Authenticate(response, session, cookie)
-            await auth.session_create(username, user["is_student"])
+            await auth.session_create(user["id"], user["name"], user["is_student"])
             return {"status": True, "message": "Logged in successfully!"}
     return {"status": False, "message": "Login failed, please try again!"}
 
@@ -96,7 +130,6 @@ async def logout(
         await session.delete(session_id)
         cookie.delete_from_response(response)
     return RedirectResponse("/login")
-
 # dummy code below
 
 
