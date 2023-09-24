@@ -1,5 +1,5 @@
 from typing import Union, Annotated
-from uuid import uuid4, UUID
+from uuid import UUID
 
 from fastapi import FastAPI, Request, Form, Response, Depends, HTTPException
 from fastapi_sessions.backends.implementations import InMemoryBackend
@@ -9,6 +9,8 @@ from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
 import services.database
+from services.user_helper import get_user
+from services.course_helper import filter_courses, get_course, course_exists, course_students
 from sessions.auth_session_data import AuthSessionData
 from sessions.auth_verifier import AuthVerifier
 from sessions.authenticate import Authenticate
@@ -18,10 +20,31 @@ db = services.database.conn()
 # templates ob ject
 templates = Jinja2Templates(directory="views")
 
-# example user data
-fake_data = [
-    {"name": "lharris261@my.stlcc.edu", "password": "", "is_student": True},
-    {"name": "root", "password": "", "is_student": False},
+# setup dummy data
+user_data = [
+    {"id": 1, "name": "root", "email": "root", "is_student": False},
+    {"id": 2, "name": "Teacher", "email": "teacher@my.stlcc.edu", "is_student": False},
+    {"id": 3, "name": "Student", "email": "student@my.stlcc.edu", "is_student": True},
+    {"id": 4, "name": "Student 2", "email": "student2@my.stlcc.edu", "is_student": True},
+]
+
+course_data = [
+    {"id": 1, "name": "Systems Analysis and Design", "course_id": 241210, "course_code": "is"},
+    {"id": 2, "name": "Graphics for the Web", "course_id": 141230, "course_code": "is"},
+    {"id": 3, "name": "Introductory Statistics", "course_id": 180511, "course_code": "mth"},
+]
+
+teacher_course_data = [
+    {"id": 1, "course_id": 1, "teacher_id": 1},
+    {"id": 2, "course_id": 2, "teacher_id": 2},
+    {"id": 3, "course_id": 3, "teacher_id": 2},
+]
+
+student_course_data = [
+    {"id": 1, "course_id": 1, "student_id": 3},
+    {"id": 2, "course_id": 2, "student_id": 3},
+    {"id": 3, "course_id": 3, "student_id": 3},
+    {"id": 4, "course_id": 1, "student_id": 4},
 ]
 
 # setup session + backend cookies
@@ -52,13 +75,27 @@ app = FastAPI()
 app.mount("/assets", StaticFiles(directory="assets"), name="assets")
 
 
+# Setup student/teacher dashboards
 @app.get("/", response_class=HTMLResponse, dependencies=[Depends(cookie)])
-def home_page(request: Request, session_data: AuthSessionData = Depends(verifier)):
-    if not session_data:
+def home_page(request: Request, sess: AuthSessionData = Depends(verifier)):
+    if not sess:
         return RedirectResponse("/login")
-    return templates.TemplateResponse("index.html", {"request": request, "data": fake_data})
+
+    temp = "teacher.html"
+    courses = teacher_course_data
+    course_type = 1
+    if sess.is_student:
+        temp = "student.html"
+        courses = student_course_data
+        course_type = 2;
+
+    # grab correct course data for teacher vs student
+    cdata = filter_courses(sess.id, courses, course_data, course_type)
+
+    return templates.TemplateResponse(f"dashboard/{temp}", {"request": request, "courses": cdata})
 
 
+# Setup authentication routes
 @app.get("/login", response_class=HTMLResponse, dependencies=[Depends(cookie)])
 def login_page(request: Request, session_data: AuthSessionData = Depends(verifier)):
     if session_data:
@@ -69,7 +106,7 @@ def login_page(request: Request, session_data: AuthSessionData = Depends(verifie
 @app.post("/login", dependencies=[Depends(cookie)])
 async def login_page(
     response: Response,
-    username: Annotated[str, Form()],
+    email: Annotated[str, Form()],
     password: Annotated[str, Form()],
     session_data: AuthSessionData = Depends(verifier)
 ):
@@ -78,10 +115,10 @@ async def login_page(
         return {"status": True, "message": "already logged in"}
 
     # loop through fake data and check if user exists, no PW matching
-    for user in fake_data:
-        if user["name"] == username:
+    for user in user_data:
+        if user["email"] == email:
             auth = Authenticate(response, session, cookie)
-            await auth.session_create(username, user["is_student"])
+            await auth.session_create(user["id"], user["email"], user["name"], user["is_student"])
             return {"status": True, "message": "Logged in successfully!"}
     return {"status": False, "message": "Login failed, please try again!"}
 
@@ -97,6 +134,103 @@ async def logout(
         cookie.delete_from_response(response)
     return RedirectResponse("/login")
 
+
+@app.get('/teacher/course/{cid}', dependencies=[Depends(cookie)])
+async def teacher_course(
+    cid: int,
+    request: Request,
+    sess: AuthSessionData = Depends(verifier)
+):
+    if not sess:
+        return RedirectResponse("/login")
+
+    # todo convert this to db
+    current = get_course(cid, course_data)
+    teaches = filter_courses(sess.id, teacher_course_data, course_data, 1)
+
+    if not course_exists(current, teaches):
+        return RedirectResponse("/login")
+
+    students = course_students(current, student_course_data, user_data)
+
+    return templates.TemplateResponse("teacher/course.html", {
+        "request": request,
+        "course": current,
+        "students": students
+    })
+
+@app.get('/teacher/course/{cid}/access_code/{uid}', dependencies=[Depends(cookie)])
+async def teacher_access_code(
+    cid: int,
+    uid: int,
+    request: Request,
+    sess: AuthSessionData = Depends(verifier)
+):
+    if not sess:
+        return RedirectResponse("/login")
+
+    # todo convert this to db
+    current = get_course(cid, course_data)
+    teaches = filter_courses(sess.id, teacher_course_data, course_data, 1)
+
+    if not course_exists(current, teaches):
+        return RedirectResponse("/login")
+
+    student = get_user(uid, user_data)
+    if not student:
+        return RedirectResponse(f'/teacher/course/{uid}')
+
+    return templates.TemplateResponse("teacher/generate_access_code.html", {
+        "request": request,
+        "course": current,
+        "student": student
+    })
+
+
+@app.get('/student/course/{cid}', dependencies=[Depends(cookie)])
+async def student_course(
+    cid: int,
+    request: Request,
+    sess: AuthSessionData = Depends(verifier)
+):
+    if not sess:
+        return RedirectResponse("/login")
+
+    # todo convert this to db
+    current = get_course(cid, course_data)
+    attends = filter_courses(sess.id, student_course_data, course_data, 2)
+
+    if not course_exists(current, attends):
+        return RedirectResponse("/login")
+
+    return templates.TemplateResponse("student/course.html", {
+        "request": request,
+        "course": current,
+    })
+
+
+@app.get('/student/course/{cid}/checkin', dependencies=[Depends(cookie)])
+async def student_course_checkin(
+    cid: int,
+    request: Request,
+    sess: AuthSessionData = Depends(verifier)
+):
+    if not sess:
+        return RedirectResponse("/login")
+
+    # todo convert this to db
+    current = get_course(cid, course_data)
+    attends = filter_courses(sess.id, student_course_data, course_data, 2)
+
+    if not course_exists(current, attends):
+        return RedirectResponse("/login")
+
+    # todo: when we add actual data we need to tell the js when the class started when the page loads
+
+    return templates.TemplateResponse("student/course_checkin.html", {
+        "request": request,
+        "course": current,
+    })
 # dummy code below
 
 

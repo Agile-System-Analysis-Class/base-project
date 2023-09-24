@@ -1,0 +1,16 @@
+{% extends 'templates/base.html' %}
+{% block content %}
+
+{% include 'templates/nav.html' %}
+
+<h2>Welcome to the Teacher Dashboard</h2>
+
+<h3>Courses</h3>
+
+<ul>
+    {% for course in courses %}
+    <li><a href="/teacher/course/{{ course.id }}">{{ course.name }}</a></li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

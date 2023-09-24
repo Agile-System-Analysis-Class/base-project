@@ -1,0 +1,12 @@
+{% extends 'templates/base.html' %}
+{% block content %}
+
+{% include 'templates/nav.html' %}
+
+<h2>Generate [{{ student.name }}] an access code in: <a href="/teacher/course/{{ course.id }}">{{ course.name }}</a></h2>
+
+<div>
+    <input type="text" style="width: 400px" value="**************" /> <button onclick="alert('not imlpemented');">Generate</button>
+</div>
+
+{% endblock %}

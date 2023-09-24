@@ -1,15 +1,15 @@
 /* login functions */
 function attemptLogin() {
 
-    var username = $("#username").siblings("input[name='username']").val().trim();
+    var email = $("#email").siblings("input[name='email']").val().trim();
     var password = $("#password").siblings("input[name='password']").val().trim();
 
-    if(username.length <= 0) {
+    if(email.length <= 0) {
         showErrorsBlock("Username cannot be left blank");
         return false;
     }
 
-    $.post("/login", {"username": username, "password": password}, function(data) {
+    $.post("/login", {"email": email, "password": password}, function(data) {
         if(data.status == false) {
             showErrorsBlock(data.message);
         } else {
