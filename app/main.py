@@ -1,21 +1,24 @@
 from typing import Union, Annotated
 from uuid import UUID
 
+from dotenv import dotenv_values
 from fastapi import FastAPI, Request, Form, Response, Depends, HTTPException
 from fastapi_sessions.backends.implementations import InMemoryBackend
 from fastapi_sessions.frontends.implementations import CookieParameters, SessionCookie
+from sqlmodel import SQLModel
 from starlette.responses import HTMLResponse, RedirectResponse
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
-import services.database
+from clients.clients_repository import create_professor_models, create_student_models
+from clients.clients_service import get_authenticated_user
+from database.helpers import setup_database_data
 from services.user_helper import get_user
 from services.course_helper import filter_courses, get_course, course_exists, course_students
 from sessions.auth_session_data import AuthSessionData
 from sessions.auth_verifier import AuthVerifier
 from sessions.authenticate import Authenticate
-
-db = services.database.conn()
+from database import engine
 
 # templates ob ject
 templates = Jinja2Templates(directory="views")
@@ -46,6 +49,8 @@ student_course_data = [
     {"id": 3, "course_id": 3, "student_id": 3},
     {"id": 4, "course_id": 1, "student_id": 4},
 ]
+
+db_config = dotenv_values('.mysql.env')
 
 # setup session + backend cookies
 cookie_params = CookieParameters()
@@ -114,12 +119,11 @@ async def login_page(
     if session_data:
         return {"status": True, "message": "already logged in"}
 
-    # loop through fake data and check if user exists, no PW matching
-    for user in user_data:
-        if user["email"] == email:
-            auth = Authenticate(response, session, cookie)
-            await auth.session_create(user["id"], user["email"], user["name"], user["is_student"])
-            return {"status": True, "message": "Logged in successfully!"}
+    account = get_authenticated_user(email, password)
+    if account is not None:
+        auth = Authenticate(response, session, cookie)
+        await auth.session_create(account.id, account.email, account.firstname, account.account_type)
+        return {"status": True, "message": "Logged in successfully!"}
     return {"status": False, "message": "Login failed, please try again!"}
 
 
@@ -233,6 +237,10 @@ async def student_course_checkin(
     })
 # dummy code below
 
+@app.get('/db_create')
+async def db_create():
+    setup_database_data()
+    return {"status": "complete"}
 
 @app.get("/set_session/{sess}")
 async def set_session(sess: str, response: Response):
@@ -247,6 +255,7 @@ async def whoami(session_data: AuthSessionData = Depends(verifier)):
     if not session_data:
         return {'login_status': "not logged in"}
     else:
+        print(session_data)
         return {'login_status': "logged in"}
 
 

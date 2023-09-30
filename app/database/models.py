@@ -2,6 +2,8 @@ from typing import Optional
 from sqlmodel import SQLModel, Field
 
 class ClientModel(SQLModel, table=True):
+    __tablename__ = "clients"
+
     id: Optional[int] = Field(default=None, primary_key=True)
     email: str
     password: str
@@ -10,6 +12,8 @@ class ClientModel(SQLModel, table=True):
     account_type: int # 1 - root, 2 - professor, 3 - student
 
 class CoursesModel(SQLModel, table=True):
+    __tablename__ = "courses"
+
     id: Optional[int] = Field(default=None, primary_key=True)
     course: int # ##-####
     course_number: str
@@ -22,6 +26,8 @@ class CoursesModel(SQLModel, table=True):
     meeting_start_time: int
 
 class CoursesRegisteredModel(SQLModel, table=True):
+    __tablename__ = "courses_registered"
+
     id: Optional[int] = Field(default=None, primary_key=True)
     client_id: int
     course_id: int
@@ -29,12 +35,16 @@ class CoursesRegisteredModel(SQLModel, table=True):
     register_date: int
 
 class TeachingCoursesRegisteredModel(SQLModel, table=True):
+    __tablename__ = "teaching_courses_registered"
+
     id: Optional[int] = Field(default=None, primary_key=True)
     client_id: int
     course_id: int
     register_date: int
 
 class AttendanceModel(SQLModel, table=True):
+    __tablename__ = "attendance"
+
     id: Optional[int] = Field(default=None, primary_key=True)
     course_id: int
     client_id: int
