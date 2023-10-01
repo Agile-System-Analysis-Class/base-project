@@ -283,7 +283,7 @@ async def student_course_checkin(
 @app.get('/db_create')
 async def db_create():
     setup_database_data()
-    return {"status": "complete"}
+    return "Generated data"
 
 @app.get("/set_session/{sess}")
 async def set_session(sess: str, response: Response):
