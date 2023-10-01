@@ -10,9 +10,11 @@ from starlette.responses import HTMLResponse, RedirectResponse
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
-from clients.clients_repository import create_professor_models, create_student_models
-from clients.clients_service import get_authenticated_user
-from database.helpers import setup_database_data
+from domain.root.root_repository import generate_demo_data
+from helpers.dashboard_helper import display_root_dashboard
+from domain.clients.clients_repository import create_professor_models, create_student_models, find_by_session
+from domain.clients.clients_service import get_authenticated_user
+from database.helpers import setup_database_data, is_setup_complete
 from services.user_helper import get_user
 from services.course_helper import filter_courses, get_course, course_exists, course_students
 from sessions.auth_session_data import AuthSessionData
@@ -80,24 +82,65 @@ app = FastAPI()
 app.mount("/assets", StaticFiles(directory="assets"), name="assets")
 
 
+@app.middleware("http")
+async def disable_until_setup(request: Request, call_next):
+    if not request.url.path.startswith("/db_create") and not is_setup_complete():
+        return templates.TemplateResponse("setup.html", {"request": request})
+
+    response = await call_next(request)
+    return response
+
 # Setup student/teacher dashboards
 @app.get("/", response_class=HTMLResponse, dependencies=[Depends(cookie)])
 def home_page(request: Request, sess: AuthSessionData = Depends(verifier)):
     if not sess:
         return RedirectResponse("/login")
 
-    temp = "teacher.html"
-    courses = teacher_course_data
-    course_type = 1
-    if sess.is_student:
-        temp = "student.html"
-        courses = student_course_data
-        course_type = 2;
+    account = find_by_session(sess)
+    if account is None:
+        return templates.TemplateResponse("account_error.html", {
+            "request": request, "msg": "Account not found"})
 
-    # grab correct course data for teacher vs student
-    cdata = filter_courses(sess.id, courses, course_data, course_type)
+    temp: str
+    context = {"request": request}
 
-    return templates.TemplateResponse(f"dashboard/{temp}", {"request": request, "courses": cdata})
+    match account.account_type:
+        case 1:
+            temp = "root"
+            context = display_root_dashboard(request, account)
+        case 2:
+            temp = "teacher"
+        case 3:
+            temp = "student"
+        case _:
+            temp = "student"
+
+    return templates.TemplateResponse(f"dashboard/{temp}.html", context)
+
+@app.get("/generate_data", dependencies=[Depends(cookie)])
+def root_generate_data(request: Request, sess: AuthSessionData = Depends(verifier)):
+    if not sess:
+        return RedirectResponse("/login")
+
+    account = find_by_session(sess)
+    if account is None or account.account_type != 1:
+        return {"status": False, "message": "Invalid user account"}
+
+    generate_demo_data()
+
+    return {"status": True, "message": "Website data generated"}
+    # temp = "teacher.html"
+    # courses = teacher_course_data
+    # course_type = 1
+    # if sess.is_student:
+    #     temp = "student.html"
+    #     courses = student_course_data
+    #     course_type = 2;
+    #
+    # # grab correct course data for teacher vs student
+    # cdata = filter_courses(sess.id, courses, course_data, course_type)
+    #
+    # return templates.TemplateResponse(f"dashboard/{temp}", {"request": request, "courses": cdata})
 
 
 # Setup authentication routes

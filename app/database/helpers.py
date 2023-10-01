@@ -1,10 +1,8 @@
 import os.path
 
 from sqlmodel import SQLModel
-
 from database.engine import engine
-
-from clients.clients_repository import find_account, create_root_account
+from domain.clients.clients_repository import find_account, create_root_account
 
 
 def setup_database_data():
@@ -23,3 +21,8 @@ def setup_database_data():
 
     f = open(".setup_complete", "w+")
     f.close()
+
+def is_setup_complete():
+    if os.path.isfile(".setup_complete"):
+        return True
+    return False

@@ -1,4 +1,7 @@
 # filter our dummy course data until we implement actual database models
+from database.models import ClientModel
+
+
 def filter_courses(uid: int, course_data: list[dict], courses: list[dict], ctype: int):
     found = []
     for data in course_data:
@@ -49,3 +52,5 @@ def course_students(current: dict, cdata: list[dict], students: list[dict]):
                     found.append(student)
 
     return found
+
+# def account_dashboard(account: ClientModel)

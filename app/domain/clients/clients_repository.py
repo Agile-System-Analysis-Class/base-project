@@ -2,6 +2,7 @@ import bcrypt
 from database.models import ClientModel
 from database.engine import engine
 from sqlmodel import Session, select
+from sessions.auth_session_data import AuthSessionData
 
 
 def create_professor_models(total: int = 3):
@@ -32,10 +33,23 @@ def find_account(email: str):
         result = db.exec(query).one_or_none()
         return result
 
-def create_root_account():
-    pw_salt = bcrypt.gensalt(rounds=15)
-    pw = bcrypt.hashpw(b"abc123", pw_salt)
+def find_by_session(data: AuthSessionData):
+    user = find_account(data.email)
+    if user is not None:
+        return user
+    return None
 
+def create_root_account():
+    pw = create_password("abc123")
+
+    create_client_model(ClientModel(email="root", password=pw, firstname="root", lastname="root", account_type=1))
+
+
+def create_password(pw: str):
+    pw_salt = bcrypt.gensalt(rounds=15)
+    return bcrypt.hashpw(pw.encode('utf-8'), pw_salt)
+
+def create_client_model(client: ClientModel):
     with Session(engine) as db:
-        db.add(ClientModel(email="root", password=pw, firstname="root", lastname="root", account_type=1))
+        db.add(client)
         db.commit()

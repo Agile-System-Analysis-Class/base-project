@@ -20,10 +20,10 @@ class CoursesModel(SQLModel, table=True):
     course_title: str
     credit_hours: int
     capacity: int
-    access_code: str
-    start_date: int
-    finish_date: int
-    meeting_start_time: int
+    access_code: Optional[str] = None
+    start_date: Optional[int] = None
+    finish_date: Optional[int] = None
+    meeting_start_time: Optional[int] = None
 
 class CoursesRegisteredModel(SQLModel, table=True):
     __tablename__ = "courses_registered"
@@ -31,8 +31,8 @@ class CoursesRegisteredModel(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     client_id: int
     course_id: int
-    grade: int
-    register_date: int
+    grade: Optional[int] = None
+    register_date: Optional[int] = None
 
 class TeachingCoursesRegisteredModel(SQLModel, table=True):
     __tablename__ = "teaching_courses_registered"
@@ -40,7 +40,7 @@ class TeachingCoursesRegisteredModel(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     client_id: int
     course_id: int
-    register_date: int
+    register_date: Optional[int] = None
 
 class AttendanceModel(SQLModel, table=True):
     __tablename__ = "attendance"
@@ -48,4 +48,4 @@ class AttendanceModel(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     course_id: int
     client_id: int
-    date_marked_present: int
+    date_marked_present: Optional[int] = None
