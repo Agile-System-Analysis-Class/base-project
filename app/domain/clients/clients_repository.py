@@ -33,6 +33,12 @@ def find_account(email: str):
         result = db.exec(query).one_or_none()
         return result
 
+def find_account_by_id(id: int):
+    with Session(engine) as db:
+        query = select(ClientModel).where(ClientModel.id == id)
+        result = db.exec(query).one_or_none()
+        return result
+
 def find_by_session(data: AuthSessionData):
     user = find_account(data.email)
     if user is not None:

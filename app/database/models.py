@@ -29,8 +29,8 @@ class CoursesRegisteredModel(SQLModel, table=True):
     __tablename__ = "courses_registered"
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    client_id: int
-    course_id: int
+    client_id: int = Field(foreign_key="clients.id")
+    course_id: int = Field(foreign_key="courses.id")
     grade: Optional[int] = None
     register_date: Optional[int] = None
 
@@ -38,8 +38,8 @@ class TeachingCoursesRegisteredModel(SQLModel, table=True):
     __tablename__ = "teaching_courses_registered"
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    client_id: int
-    course_id: int
+    client_id: int = Field(foreign_key="clients.id")
+    course_id: int = Field(foreign_key="courses.id")
     register_date: Optional[int] = None
 
 class AttendanceModel(SQLModel, table=True):

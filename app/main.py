@@ -10,13 +10,13 @@ from starlette.responses import HTMLResponse, RedirectResponse
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
+from domain.courses.courses_repository import find_professor_courses_by_client_id, find_course, find_course_students_by_id
 from domain.root.root_repository import generate_demo_data
-from helpers.dashboard_helper import display_root_dashboard
-from domain.clients.clients_repository import create_professor_models, create_student_models, find_by_session
+from helpers.dashboard_helper import display_root_dashboard, display_professor_dashboard, display_student_dashboard
+from domain.clients.clients_repository import create_professor_models, create_student_models, find_by_session, \
+    find_account_by_id
 from domain.clients.clients_service import get_authenticated_user
 from database.helpers import setup_database_data, is_setup_complete
-from services.user_helper import get_user
-from services.course_helper import filter_courses, get_course, course_exists, course_students
 from sessions.auth_session_data import AuthSessionData
 from sessions.auth_verifier import AuthVerifier
 from sessions.authenticate import Authenticate
@@ -24,33 +24,6 @@ from database import engine
 
 # templates ob ject
 templates = Jinja2Templates(directory="views")
-
-# setup dummy data
-user_data = [
-    {"id": 1, "name": "root", "email": "root", "is_student": False},
-    {"id": 2, "name": "Teacher", "email": "teacher@my.stlcc.edu", "is_student": False},
-    {"id": 3, "name": "Student", "email": "student@my.stlcc.edu", "is_student": True},
-    {"id": 4, "name": "Student 2", "email": "student2@my.stlcc.edu", "is_student": True},
-]
-
-course_data = [
-    {"id": 1, "name": "Systems Analysis and Design", "course_id": 241210, "course_code": "is"},
-    {"id": 2, "name": "Graphics for the Web", "course_id": 141230, "course_code": "is"},
-    {"id": 3, "name": "Introductory Statistics", "course_id": 180511, "course_code": "mth"},
-]
-
-teacher_course_data = [
-    {"id": 1, "course_id": 1, "teacher_id": 1},
-    {"id": 2, "course_id": 2, "teacher_id": 2},
-    {"id": 3, "course_id": 3, "teacher_id": 2},
-]
-
-student_course_data = [
-    {"id": 1, "course_id": 1, "student_id": 3},
-    {"id": 2, "course_id": 2, "student_id": 3},
-    {"id": 3, "course_id": 3, "student_id": 3},
-    {"id": 4, "course_id": 1, "student_id": 4},
-]
 
 db_config = dotenv_values('.mysql.env')
 
@@ -110,15 +83,17 @@ def home_page(request: Request, sess: AuthSessionData = Depends(verifier)):
             context = display_root_dashboard(request, account)
         case 2:
             temp = "teacher"
+            context = display_professor_dashboard(request, account)
         case 3:
             temp = "student"
+            context = display_student_dashboard(request, account)
         case _:
             temp = "student"
 
     return templates.TemplateResponse(f"dashboard/{temp}.html", context)
 
 @app.get("/generate_data", dependencies=[Depends(cookie)])
-def root_generate_data(request: Request, sess: AuthSessionData = Depends(verifier)):
+def root_generate_data(sess: AuthSessionData = Depends(verifier)):
     if not sess:
         return RedirectResponse("/login")
 
@@ -129,18 +104,6 @@ def root_generate_data(request: Request, sess: AuthSessionData = Depends(verifie
     generate_demo_data()
 
     return {"status": True, "message": "Website data generated"}
-    # temp = "teacher.html"
-    # courses = teacher_course_data
-    # course_type = 1
-    # if sess.is_student:
-    #     temp = "student.html"
-    #     courses = student_course_data
-    #     course_type = 2;
-    #
-    # # grab correct course data for teacher vs student
-    # cdata = filter_courses(sess.id, courses, course_data, course_type)
-    #
-    # return templates.TemplateResponse(f"dashboard/{temp}", {"request": request, "courses": cdata})
 
 
 # Setup authentication routes
@@ -191,18 +154,15 @@ async def teacher_course(
     if not sess:
         return RedirectResponse("/login")
 
-    # todo convert this to db
-    current = get_course(cid, course_data)
-    teaches = filter_courses(sess.id, teacher_course_data, course_data, 1)
-
-    if not course_exists(current, teaches):
+    course = find_course(cid)
+    if course is None:
         return RedirectResponse("/login")
 
-    students = course_students(current, student_course_data, user_data)
+    students = find_course_students_by_id(cid)
 
     return templates.TemplateResponse("teacher/course.html", {
         "request": request,
-        "course": current,
+        "course": course,
         "students": students
     })
 
@@ -216,20 +176,17 @@ async def teacher_access_code(
     if not sess:
         return RedirectResponse("/login")
 
-    # todo convert this to db
-    current = get_course(cid, course_data)
-    teaches = filter_courses(sess.id, teacher_course_data, course_data, 1)
-
-    if not course_exists(current, teaches):
+    course = find_course(cid)
+    if course is None:
         return RedirectResponse("/login")
 
-    student = get_user(uid, user_data)
+    student = find_account_by_id(uid)
     if not student:
         return RedirectResponse(f'/teacher/course/{uid}')
 
     return templates.TemplateResponse("teacher/generate_access_code.html", {
         "request": request,
-        "course": current,
+        "course": course,
         "student": student
     })
 
@@ -243,16 +200,13 @@ async def student_course(
     if not sess:
         return RedirectResponse("/login")
 
-    # todo convert this to db
-    current = get_course(cid, course_data)
-    attends = filter_courses(sess.id, student_course_data, course_data, 2)
-
-    if not course_exists(current, attends):
+    course = find_course(cid)
+    if course is None:
         return RedirectResponse("/login")
 
     return templates.TemplateResponse("student/course.html", {
         "request": request,
-        "course": current,
+        "course": course,
     })
 
 
@@ -265,50 +219,46 @@ async def student_course_checkin(
     if not sess:
         return RedirectResponse("/login")
 
-    # todo convert this to db
-    current = get_course(cid, course_data)
-    attends = filter_courses(sess.id, student_course_data, course_data, 2)
-
-    if not course_exists(current, attends):
+    course = find_course(cid)
+    if course is None:
         return RedirectResponse("/login")
 
     # todo: when we add actual data we need to tell the js when the class started when the page loads
 
     return templates.TemplateResponse("student/course_checkin.html", {
         "request": request,
-        "course": current,
+        "course": course,
     })
+
+@app.get('/env_setup', response_class=HTMLResponse)
+async def db_create(request: Request):
+    setup_database_data()
+    return templates.TemplateResponse("setup_complete.html", {
+        "request": request,
+    })
+
 # dummy code below
 
-@app.get('/db_create')
-async def db_create():
-    setup_database_data()
-    return "Generated data"
-
-@app.get("/set_session/{sess}")
-async def set_session(sess: str, response: Response):
-    auth = Authenticate(response, session, cookie)
-    name = await auth.session_create(sess, False)
-
-    return f"created session for {name}"
-
-
-@app.get("/whoami", dependencies=[Depends(cookie)])
-async def whoami(session_data: AuthSessionData = Depends(verifier)):
-    if not session_data:
-        return {'login_status': "not logged in"}
-    else:
-        print(session_data)
-        return {'login_status': "logged in"}
-
-
-@app.get('/delete_session')
-async def del_session(response: Response, session_id: UUID = Depends(cookie)):
-    await session.delete(session_id)
-    cookie.delete_from_response(response)
-    return "deleted session"
-
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
+#
+# @app.get("/set_session/{sess}")
+# async def set_session(sess: str, response: Response):
+#     auth = Authenticate(response, session, cookie)
+#     name = await auth.session_create(sess, False)
+#
+#     return f"created session for {name}"
+#
+#
+# @app.get("/whoami", dependencies=[Depends(cookie)])
+# async def whoami(session_data: AuthSessionData = Depends(verifier)):
+#     if not session_data:
+#         return {'login_status': "not logged in"}
+#     else:
+#         print(session_data)
+#         return {'login_status': "logged in"}
+#
+#
+# @app.get('/delete_session')
+# async def del_session(response: Response, session_id: UUID = Depends(cookie)):
+#     await session.delete(session_id)
+#     cookie.delete_from_response(response)
+#     return "deleted session"

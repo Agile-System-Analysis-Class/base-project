@@ -5,4 +5,4 @@ class AuthSessionData(BaseModel):
     id: int = Field(default=0)
     email: str
     username: str
-    is_student: bool
+    account_type: int
