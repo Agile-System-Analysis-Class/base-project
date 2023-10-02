@@ -1,0 +1,28 @@
+{% extends 'templates/base.html' %}
+{% block header_js %}
+{{ super() }}
+<script type="text/javascript" src="{{ url_for('assets', path='js/root/generate.js') }}"></script>
+
+{% endblock %}
+
+{% block content %}
+
+{% include 'templates/nav.html' %}
+
+<h2>Welcome to the Root Administrator Dashboard</h2>
+
+<h3>Generate example data</h3>
+<div class="form">
+    <div class="errors-block" id="errors-block"></div>
+    <form method="post" onsubmit="rootGenerateWebsiteData(); return false;">
+        <input type="submit" name="submit" value="Generate Data" />
+    </form>
+</div>
+
+<!--<ul>-->
+<!--    {% for course in courses %}-->
+<!--    <li><a href="/teacher/course/{{ course.id }}">{{ course.name }}</a></li>-->
+<!--    {% endfor %}-->
+<!--</ul>-->
+
+{% endblock %}

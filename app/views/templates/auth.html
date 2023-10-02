@@ -9,6 +9,7 @@
     {% block header_css %}<link rel="stylesheet" href="{{ url_for('assets', path='css/base.css') }}" />{% endblock %}
     {% block header_js %}
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="{{ url_for('assets', path='js/general.js') }}"></script>
     {% endblock %}
 </head>
 <body>

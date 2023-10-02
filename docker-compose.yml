@@ -6,14 +6,14 @@ services:
     ports:
       - "3306:3306"
     env_file:
-      - ./.mysql.env
+      - ./app/.mysql.env
     networks:
       - deploy_fast_api_project
     expose:
         - "3306"
   web:
     build: .
-    command: uvicorn main:app --host 0.0.0.0
+    command: uvicorn main:app --host 0.0.0.0 --reload
     volumes:
       - ./app:/app
     ports:
@@ -21,7 +21,7 @@ services:
     networks:
       - deploy_fast_api_project
     env_file:
-      - ./.env
+      - ./app/.env
     restart: unless-stopped
     depends_on:
       - db

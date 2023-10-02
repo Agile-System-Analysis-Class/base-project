@@ -3,7 +3,7 @@
 
 {% include 'templates/nav.html' %}
 
-<h2>Generate [{{ student.name }}] an access code in: <a href="/teacher/course/{{ course.id }}">{{ course.name }}</a></h2>
+<h2>Generate [{{ student.firstname }} {{ student.lastname }}] an access code in: <a href="/teacher/course/{{ course.id }}">{{ course.course_number }} -  {{ course.course_title }}</a></h2>
 
 <div>
     <input type="text" style="width: 400px" value="**************" /> <button onclick="alert('not imlpemented');">Generate</button>

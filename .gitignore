@@ -2,3 +2,4 @@ venv
 .idea
 .env
 .mysql.env
+app/.setup_complete
