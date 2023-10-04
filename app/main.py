@@ -57,7 +57,7 @@ app.mount("/assets", StaticFiles(directory="assets"), name="assets")
 
 @app.middleware("http")
 async def disable_until_setup(request: Request, call_next):
-    if not request.url.path.startswith("/db_create") and not is_setup_complete():
+    if not request.url.path.startswith("/env_create") and not is_setup_complete():
         return templates.TemplateResponse("setup.html", {"request": request})
 
     response = await call_next(request)
