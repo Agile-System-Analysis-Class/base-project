@@ -19,6 +19,36 @@
     </form>
 </div>
 
+<h3>Generated data</h3>
+{% if data and data|length > 0 %}
+{% for item in data %}
+<div class="root-professor-course-block">
+    <h4>Professor: {{ item.professor.firstname }} {{ item.professor.lastname }} ({{ item.professor.email }})</h4>
+    <div>
+        <div><strong>Courses:</strong></div>
+        {% if item.courses and item.courses|length > 0 %}
+            {% for course in item.courses %}
+            <div class="root-dashboard-generated-course-block">
+                <div class="course-name">{{ course.course.course_number }} - {{ course.course.course_title }} [{{ course.course.course }}]</div>
+                <div>
+                    <div><strong>Students:</strong></div>
+                    <div>
+                        {% if course.students and course.students|length > 0 %}
+                        {% for student in course.students %}
+                        <div>#{{ student.id }}. {{ student.firstname }} {{ student.lastname }} ({{ student.email }})</div>
+                        {% endfor %}
+                        {% else %}
+                        <em>None</em>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+</div>
+{% endfor %}
+{% endif %}
 <!--<ul>-->
 <!--    {% for course in courses %}-->
 <!--    <li><a href="/teacher/course/{{ course.id }}">{{ course.name }}</a></li>-->

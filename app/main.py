@@ -69,14 +69,17 @@ def home_page(request: Request, sess: AuthSessionData = Depends(verifier)):
     if not sess:
         return RedirectResponse("/login")
 
+    # check if the user data exists else, show an account error template
     account = find_by_session(sess)
     if account is None:
         return templates.TemplateResponse("account_error.html", {
             "request": request, "msg": "Account not found"})
 
+    # setup variables for later usage
     temp: str
     context = {"request": request}
 
+    # check account type to display the correct dashboard
     match account.account_type:
         case 1:
             temp = "root"

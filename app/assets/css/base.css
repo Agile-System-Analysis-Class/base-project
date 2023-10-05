@@ -6,3 +6,18 @@
     margin-bottom: 10px;
     width: 500px;
 }
+
+.root-professor-course-block {
+    margin-bottom: 10px;
+    padding-bottom: 20px;
+    border-bottom: 1px dashed black;
+}
+
+.root-dashboard-generated-course-block {
+    margin-bottom: 5px;
+    border-bottom: 1px solid black;
+}
+
+.root-dashboard-generated-course-block .course-name {
+    margin-bottom: 3px;
+}

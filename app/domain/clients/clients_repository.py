@@ -27,6 +27,14 @@ def create_array_models(email: str, name: str, lname: str, total: int, account_t
 
     return models
 
+# grabs all generated accounts in the datatabase
+def find_all_accounts():
+    with Session(engine) as db:
+        query = select(ClientModel)
+        results = db.exec(query).all()
+        return results
+
+
 def find_account(email: str):
     with Session(engine) as db:
         query = select(ClientModel).where(ClientModel.email == email)

@@ -2,6 +2,13 @@ from database.models import ClientModel, CoursesModel, CoursesRegisteredModel, T
 from database.engine import engine
 from sqlmodel import Session, select
 
+def find_all_courses():
+    with Session(engine) as db:
+        query = select(CoursesModel)
+        results = db.exec(query).all()
+        return results
+
+
 def find_professor_courses_by_client_id(cid: int):
     courses = []
     with Session(engine) as db:
@@ -37,6 +44,5 @@ def find_course_students_by_id(cid: int):
         query = select(CoursesRegisteredModel, ClientModel).join(ClientModel).where(CoursesRegisteredModel.course_id == cid)
         results = db.exec(query)
         for (course, client) in results:
-            print(course, client)
             students.append(client)
     return students
