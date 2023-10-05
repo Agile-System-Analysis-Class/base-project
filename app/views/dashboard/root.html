@@ -31,19 +31,31 @@
         {% if item.courses and item.courses|length > 0 %}
             {% for course in item.courses %}
             <div class="root-dashboard-generated-course-block">
+                <div><em><u>Course name</u></em></div>
                 <div class="course-name">{{ course.course.course_number }} - {{ course.course.course_title }} [{{ course.course.course }}]</div>
-                <div>
-                    <div><strong>Students:</strong></div>
-                    <div>
-                        {% if course.students and course.students|length > 0 %}
-                        {% for student in course.students %}
-                        <div>#{{ student.id }}. {{ student.firstname }} {{ student.lastname }} ({{ student.email }})</div>
-                        {% endfor %}
-                        {% else %}
-                        <em>None</em>
-                        {% endif %}
-                    </div>
-                </div>
+                <div><em><u>Students:</u></em></div>
+                <table>
+                    <tr>
+                        <td>#id</td>
+                        <td>Firstname</td>
+                        <td>Lastname</td>
+                        <td>email</td>
+                    </tr>
+                    {% if course.students and course.students|length > 0 %}
+                    {% for student in course.students %}
+                    <tr>
+                        <td width="25px">#{{ student.id }}</td>
+                        <td>{{ student.firstname }}</td>
+                        <td>{{ student.lastname }}</td>
+                        <td>{{ student.email }})</td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="4"><em>No students generated</em></td>
+                    </tr>
+                    {% endif %}
+                </table>
             </div>
             {% endfor %}
         {% endif %}
