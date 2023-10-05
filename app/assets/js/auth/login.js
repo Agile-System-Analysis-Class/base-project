@@ -14,7 +14,9 @@ function attemptLogin() {
             showErrorsBlock(data.message);
         } else {
             // redirect to login
-            window.location = "/";
+            showSuccessBlock("Login successful", 2, function() {
+                window.location = "/";
+            });
         }
     });
 

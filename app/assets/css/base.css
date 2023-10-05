@@ -7,6 +7,15 @@
     width: 500px;
 }
 
+.errors-block {
+    display: none;
+    padding: 5px;
+    border: 1px solid blue;
+    font-size: 16px;
+    margin-bottom: 10px;
+    width: 500px;
+}
+
 .root-professor-course-block {
     margin-bottom: 10px;
     padding-bottom: 20px;
