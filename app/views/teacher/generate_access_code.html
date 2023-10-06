@@ -1,4 +1,9 @@
 {% extends 'templates/base.html' %}
+{% block header_js %}
+{{ super() }}
+<script type="text/javascript" src="{{ url_for('assets', path='js/teacher/generate_access_code.js') }}"></script>
+
+{% endblock %}
 {% block content %}
 
 {% include 'templates/nav.html' %}
@@ -6,7 +11,11 @@
 <h2>Generate an access code in: <a href="/teacher/course/{{ course.id }}">{{ course.course_number }} -  {{ course.course_title }}</a></h2>
 
 <div>
-    <input type="text" style="width: 400px" value="**************" /> <button onclick="alert('not imlpemented');">Generate</button> <button onclick="alert('not imlpemented');"><i class="fa-regular fa-copy"></i></button>
+    <div id="errors-block"></div>
+    <div id="success-block"></div>
+    <form onsubmit="return false;">
+        <input id="access_code" type="text" style="width: 400px" value="{{ course.access_code }}" /> <button onclick="generate_access_code({{ course.id }});">Generate</button> <a href="" onclick="alert('not imlpemented');"><i class="fa-regular fa-copy"></i></a>
+    </form>
 </div>
 
 {% endblock %}

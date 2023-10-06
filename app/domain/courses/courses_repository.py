@@ -1,3 +1,6 @@
+import random
+import string
+
 from database.models import ClientModel, CoursesModel, CoursesRegisteredModel, TeachingCoursesRegisteredModel
 from database.engine import engine
 from sqlmodel import Session, select
@@ -46,3 +49,22 @@ def find_course_students_by_id(cid: int):
         for (course, client) in results:
             students.append(client)
     return students
+
+def generate_and_store_course_access_code(cid: int):
+    code = generate_random_string()
+    course = find_course(cid)
+    if course is not None:
+        course.access_code = code
+        save(course)
+        return code
+    return None
+
+
+    # with Session(engine) as db:
+def save(course: CoursesModel):
+    with Session(engine) as db:
+        db.add(course)
+        db.commit()
+
+def generate_random_string(length: int = 8):
+    return ''.join(random.choices(string.ascii_letters, k=length))
