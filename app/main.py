@@ -169,10 +169,9 @@ async def teacher_course(
         "students": students
     })
 
-@app.get('/teacher/course/{cid}/access_code/{uid}', dependencies=[Depends(cookie)])
+@app.get('/teacher/course/{cid}/access_code', dependencies=[Depends(cookie)])
 async def teacher_access_code(
     cid: int,
-    uid: int,
     request: Request,
     sess: AuthSessionData = Depends(verifier)
 ):
@@ -183,14 +182,9 @@ async def teacher_access_code(
     if course is None:
         return RedirectResponse("/login")
 
-    student = find_account_by_id(uid)
-    if not student:
-        return RedirectResponse(f'/teacher/course/{uid}')
-
     return templates.TemplateResponse("teacher/generate_access_code.html", {
         "request": request,
         "course": course,
-        "student": student
     })
 
 
