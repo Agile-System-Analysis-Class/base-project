@@ -59,4 +59,4 @@ That's the limit to this demo.
 ## Running tests
 
 - Install `nose2` with `pip` locally
-- Then travel to the `app` folder and run `nose2` command. it'll run all the tests in the tests folder
+- Then travel to the root folder and run `nose2` command. it'll run all the tests in the tests folder
