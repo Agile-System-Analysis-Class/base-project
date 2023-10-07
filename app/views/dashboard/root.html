@@ -14,11 +14,55 @@
 <h3>Generate example data</h3>
 <div class="form">
     <div class="errors-block" id="errors-block"></div>
+    <div class="success-block" id="success-block"></div>
+    <div class="waiting-block" id="waiting-block"></div>
     <form method="post" onsubmit="rootGenerateWebsiteData(); return false;">
         <input type="submit" name="submit" value="Generate Data" />
     </form>
 </div>
 
+<h3>Generated data</h3>
+{% if data and data|length > 0 %}
+{% for item in data %}
+<div class="root-professor-course-block">
+    <h4>Professor: {{ item.professor.firstname }} {{ item.professor.lastname }} ({{ item.professor.email }})</h4>
+    <div>
+        <div><strong>Courses:</strong></div>
+        {% if item.courses and item.courses|length > 0 %}
+            {% for course in item.courses %}
+            <div class="root-dashboard-generated-course-block">
+                <div><em><u>Course name</u></em></div>
+                <div class="course-name">{{ course.course.course_number }} - {{ course.course.course_title }} [{{ course.course.course }}]</div>
+                <div><em><u>Students:</u></em></div>
+                <table>
+                    <tr>
+                        <td>#id</td>
+                        <td>Firstname</td>
+                        <td>Lastname</td>
+                        <td>email</td>
+                    </tr>
+                    {% if course.students and course.students|length > 0 %}
+                    {% for student in course.students %}
+                    <tr>
+                        <td width="25px">#{{ student.id }}</td>
+                        <td>{{ student.firstname }}</td>
+                        <td>{{ student.lastname }}</td>
+                        <td>{{ student.email }})</td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="4"><em>No students generated</em></td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+</div>
+{% endfor %}
+{% endif %}
 <!--<ul>-->
 <!--    {% for course in courses %}-->
 <!--    <li><a href="/teacher/course/{{ course.id }}">{{ course.name }}</a></li>-->

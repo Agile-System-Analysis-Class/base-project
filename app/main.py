@@ -10,7 +10,8 @@ from starlette.responses import HTMLResponse, RedirectResponse
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
-from domain.courses.courses_repository import find_professor_courses_by_client_id, find_course, find_course_students_by_id
+from domain.courses.courses_repository import find_professor_courses_by_client_id, find_course, \
+    find_course_students_by_id, generate_and_store_course_access_code
 from domain.root.root_repository import generate_demo_data
 from helpers.dashboard_helper import display_root_dashboard, display_professor_dashboard, display_student_dashboard
 from domain.clients.clients_repository import create_professor_models, create_student_models, find_by_session, \
@@ -69,14 +70,17 @@ def home_page(request: Request, sess: AuthSessionData = Depends(verifier)):
     if not sess:
         return RedirectResponse("/login")
 
+    # check if the user data exists else, show an account error template
     account = find_by_session(sess)
     if account is None:
         return templates.TemplateResponse("account_error.html", {
             "request": request, "msg": "Account not found"})
 
+    # setup variables for later usage
     temp: str
     context = {"request": request}
 
+    # check account type to display the correct dashboard
     match account.account_type:
         case 1:
             temp = "root"
@@ -111,7 +115,7 @@ def root_generate_data(sess: AuthSessionData = Depends(verifier)):
 def login_page(request: Request, session_data: AuthSessionData = Depends(verifier)):
     if session_data:
         return RedirectResponse("/")
-    return templates.TemplateResponse("auth/login.html", {"request": request})
+    return templates.TemplateResponse("auth/login.html", {"request": request, "email": "pro1@my.stlcc.edu", "pw": "1234"})
 
 
 @app.post("/login", dependencies=[Depends(cookie)])
@@ -166,10 +170,9 @@ async def teacher_course(
         "students": students
     })
 
-@app.get('/teacher/course/{cid}/access_code/{uid}', dependencies=[Depends(cookie)])
+@app.get('/teacher/course/{cid}/access_code', dependencies=[Depends(cookie)])
 async def teacher_access_code(
     cid: int,
-    uid: int,
     request: Request,
     sess: AuthSessionData = Depends(verifier)
 ):
@@ -180,15 +183,35 @@ async def teacher_access_code(
     if course is None:
         return RedirectResponse("/login")
 
-    student = find_account_by_id(uid)
-    if not student:
-        return RedirectResponse(f'/teacher/course/{uid}')
-
     return templates.TemplateResponse("teacher/generate_access_code.html", {
         "request": request,
         "course": course,
-        "student": student
     })
+
+
+@app.post('/teacher/course/{cid}/access_code', dependencies=[Depends(cookie)])
+async def teacher_access_code(
+    cid: int,
+    sess: AuthSessionData = Depends(verifier)
+):
+    status = True
+    message: str
+
+    if not sess:
+        return {"status": status, "message": "not authenticated"}
+
+    course = find_course(cid)
+    if course is None:
+        return {"status": status, "message": "You don't teach this course"}
+
+    # set a new token in the database
+    code = generate_and_store_course_access_code(cid)
+    if code is not None:
+        message = code
+    else:
+        message = "There was a problem generating access code for this course"
+        status = False
+    return {"status": status, "message": message}
 
 
 @app.get('/student/course/{cid}', dependencies=[Depends(cookie)])

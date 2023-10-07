@@ -1,9 +1,24 @@
 from database.models import ClientModel
+from domain.clients.clients_repository import find_all_accounts
 from domain.courses.courses_repository import find_professor_courses_by_client_id, find_student_courses_by_client_id
+from domain.courses.courses_repository import find_all_courses
+from domain.courses.teaching_courses_registered_repository import find_all_teaching_courses
+from domain.courses.courses_registered_repository import find_all_student_courses
+from domain.root.root_dashboard_service import filter_generated_data
 from fastapi import Request
 
+
+
 def display_root_dashboard(request: Request, acct: ClientModel):
-    return {"request": request}
+    accounts = find_all_accounts()
+    courses = find_all_courses()
+    professor_course_data = find_all_teaching_courses()
+    student_course_data = find_all_student_courses()
+
+    data = filter_generated_data(accounts, courses, professor_course_data, student_course_data)
+    print(data)
+
+    return {"request": request, "data": data}
 
 def display_professor_dashboard(request: Request, acc: ClientModel):
     courses = find_professor_courses_by_client_id(acc.id)
