@@ -3,6 +3,7 @@ from app.database.engine import engine
 from app.domain.clients.clients_repository import create_password
 from sqlmodel import Session, select
 
+from app.domain.courses.courses_repository import find_all_courses
 
 
 def generate_demo_data():
@@ -14,11 +15,12 @@ def generate_demo_data():
         for result in results:
             db.delete(result)
 
-
-        db.execute("TRUNCATE `courses`")
-        db.execute("TRUNCATE `attendance`")
-        db.execute("TRUNCATE `courses_registered`")
-        db.execute("TRUNCATE `teaching_courses_registered`")
+        courses = find_all_courses()
+        if len(courses) > 0:
+            db.execute("TRUNCATE `courses`")
+            db.execute("TRUNCATE `attendance`")
+            db.execute("TRUNCATE `courses_registered`")
+            db.execute("TRUNCATE `teaching_courses_registered`")
 
         # create courses
         courses = [

@@ -113,7 +113,7 @@ def root_generate_data(sess: AuthSessionData = Depends(verifier)):
 def login_page(request: Request, session_data: AuthSessionData = Depends(verifier)):
     if session_data:
         return RedirectResponse("/")
-    return templates.TemplateResponse("auth/login.html", {"request": request, "email": "pro1@my.stlcc.edu", "pw": "1234"})
+    return templates.TemplateResponse("auth/login.html", {"request": request})
 
 
 @app.post("/login", dependencies=[Depends(cookie)])
