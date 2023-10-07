@@ -4,7 +4,7 @@ from fastapi import Response
 from fastapi_sessions.backends import SessionBackend
 from fastapi_sessions.frontends.implementations import SessionCookie
 
-from sessions.auth_session_data import AuthSessionData
+from app.sessions.auth_session_data import AuthSessionData
 
 
 class Authenticate:

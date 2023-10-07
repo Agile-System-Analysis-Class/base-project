@@ -1,4 +1,4 @@
-from database.models import ClientModel, CoursesModel, TeachingCoursesRegisteredModel, CoursesRegisteredModel
+from app.database.models import ClientModel, CoursesModel, TeachingCoursesRegisteredModel, CoursesRegisteredModel
 
 
 # this function filters through the database fields instead of using join data

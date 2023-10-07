@@ -1,8 +1,8 @@
 import os.path
 
 from sqlmodel import SQLModel
-from database.engine import engine
-from domain.clients.clients_repository import find_account, create_root_account
+from app.database.engine import engine
+from app.domain.clients.clients_repository import find_account, create_root_account
 
 
 def setup_database_data():

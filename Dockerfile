@@ -4,7 +4,7 @@
 FROM python:3.11.1-slim
 
 # set work directory
-WORKDIR /app
+WORKDIR /website
 
 # set env variables
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -22,4 +22,5 @@ RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 # copy project
-COPY . .
+# COPY . .
+COPY ./app /website/app

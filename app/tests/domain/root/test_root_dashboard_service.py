@@ -1,8 +1,8 @@
 import unittest
 
-from database.models import ClientModel, CoursesModel, CoursesRegisteredModel
+from app.database.models import ClientModel, CoursesModel, CoursesRegisteredModel
 
-from domain.root.root_dashboard_service import (filter_course_by_id, filter_students_by_student_id,
+from app.domain.root.root_dashboard_service import (filter_course_by_id, filter_students_by_student_id,
                                                 filter_students_by_course_id, filter_course_by_id)
 
 

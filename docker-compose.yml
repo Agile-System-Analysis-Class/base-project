@@ -13,9 +13,9 @@ services:
         - "3306"
   web:
     build: .
-    command: uvicorn main:app --host 0.0.0.0 --reload
+    command: uvicorn app.main:app --host 0.0.0.0 --reload
     volumes:
-      - ./app:/app
+      - ./app:/website/app
     ports:
       - 8000:8000
     networks:

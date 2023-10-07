@@ -1,6 +1,6 @@
-from database.models import ClientModel, CoursesModel, CoursesRegisteredModel, TeachingCoursesRegisteredModel
-from database.engine import engine
-from domain.clients.clients_repository import create_password
+from app.database.models import ClientModel, CoursesModel, CoursesRegisteredModel, TeachingCoursesRegisteredModel
+from app.database.engine import engine
+from app.domain.clients.clients_repository import create_password
 from sqlmodel import Session, select
 
 

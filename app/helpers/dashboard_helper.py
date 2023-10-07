@@ -1,10 +1,10 @@
-from database.models import ClientModel
-from domain.clients.clients_repository import find_all_accounts
-from domain.courses.courses_repository import find_professor_courses_by_client_id, find_student_courses_by_client_id
-from domain.courses.courses_repository import find_all_courses
-from domain.courses.teaching_courses_registered_repository import find_all_teaching_courses
-from domain.courses.courses_registered_repository import find_all_student_courses
-from domain.root.root_dashboard_service import filter_generated_data
+from app.database.models import ClientModel
+from app.domain.clients.clients_repository import find_all_accounts
+from app.domain.courses.courses_repository import find_professor_courses_by_client_id, find_student_courses_by_client_id
+from app.domain.courses.courses_repository import find_all_courses
+from app.domain.courses.teaching_courses_registered_repository import find_all_teaching_courses
+from app.domain.courses.courses_registered_repository import find_all_student_courses
+from app.domain.root.root_dashboard_service import filter_generated_data
 from fastapi import Request
 
 

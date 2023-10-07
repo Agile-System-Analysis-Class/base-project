@@ -10,23 +10,21 @@ from starlette.responses import HTMLResponse, RedirectResponse
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
-from domain.courses.courses_repository import find_professor_courses_by_client_id, find_course, \
+from app.domain.courses.courses_repository import find_professor_courses_by_client_id, find_course, \
     find_course_students_by_id, generate_and_store_course_access_code
-from domain.root.root_repository import generate_demo_data
-from helpers.dashboard_helper import display_root_dashboard, display_professor_dashboard, display_student_dashboard
-from domain.clients.clients_repository import create_professor_models, create_student_models, find_by_session, \
+from app.domain.root.root_repository import generate_demo_data
+from app.helpers.dashboard_helper import display_root_dashboard, display_professor_dashboard, display_student_dashboard
+from app.domain.clients.clients_repository import create_professor_models, create_student_models, find_by_session, \
     find_account_by_id
-from domain.clients.clients_service import get_authenticated_user
-from database.helpers import setup_database_data, is_setup_complete
-from sessions.auth_session_data import AuthSessionData
-from sessions.auth_verifier import AuthVerifier
-from sessions.authenticate import Authenticate
-from database import engine
+from app.domain.clients.clients_service import get_authenticated_user
+from app.database.helpers import setup_database_data, is_setup_complete
+from app.sessions.auth_session_data import AuthSessionData
+from app.sessions.auth_verifier import AuthVerifier
+from app.sessions.authenticate import Authenticate
+from app.database import engine
 
 # templates ob ject
-templates = Jinja2Templates(directory="views")
-
-db_config = dotenv_values('.mysql.env')
+templates = Jinja2Templates(directory="app/views")
 
 # setup session + backend cookies
 cookie_params = CookieParameters()
@@ -53,7 +51,7 @@ verifier = AuthVerifier(
 app = FastAPI()
 
 # Setting up the statis directory to be served
-app.mount("/assets", StaticFiles(directory="assets"), name="assets")
+app.mount("/website/app/assets", StaticFiles(directory="app/assets"), name="assets")
 
 
 @app.middleware("http")

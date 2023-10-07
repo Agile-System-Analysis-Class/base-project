@@ -1,5 +1,5 @@
-from database.models import TeachingCoursesRegisteredModel
-from database.engine import engine
+from app.database.models import TeachingCoursesRegisteredModel
+from app.database.engine import engine
 from sqlmodel import Session, select
 
 def find_all_teaching_courses():

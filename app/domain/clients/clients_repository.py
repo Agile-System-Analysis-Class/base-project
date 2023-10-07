@@ -1,8 +1,8 @@
 import bcrypt
-from database.models import ClientModel
-from database.engine import engine
+from app.database.models import ClientModel
+from app.database.engine import engine
+from app.sessions.auth_session_data import AuthSessionData
 from sqlmodel import Session, select
-from sessions.auth_session_data import AuthSessionData
 
 
 def create_professor_models(total: int = 3):

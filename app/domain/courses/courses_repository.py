@@ -1,8 +1,8 @@
 import random
 import string
 
-from database.models import ClientModel, CoursesModel, CoursesRegisteredModel, TeachingCoursesRegisteredModel
-from database.engine import engine
+from app.database.models import ClientModel, CoursesModel, CoursesRegisteredModel, TeachingCoursesRegisteredModel
+from app.database.engine import engine
 from sqlmodel import Session, select
 
 def find_all_courses():

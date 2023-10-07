@@ -3,7 +3,7 @@ from uuid import UUID
 from fastapi import HTTPException
 from fastapi_sessions.backends.implementations import InMemoryBackend
 from fastapi_sessions.session_verifier import SessionVerifier
-from sessions.auth_session_data import AuthSessionData
+from app.sessions.auth_session_data import AuthSessionData
 
 
 class AuthVerifier(SessionVerifier[UUID, AuthSessionData]):
