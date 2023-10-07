@@ -55,3 +55,8 @@
 - On the checkin page the student is presented a box to enter the access token and a submit button to check in for that course.
 
 That's the limit to this demo.
+
+## Running tests
+
+- Install `nose2` with `pip` locally
+- Then travel to the `app` folder and run `nose2` command. it'll run all the tests in the tests folder
