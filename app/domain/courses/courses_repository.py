@@ -1,3 +1,7 @@
+### Contributors: Lamonte Harris
+### Description: Courses repository file used to grab data from the database based on the criteria we pass
+### to the functions
+
 import random
 import string
 
@@ -6,6 +10,11 @@ from app.database.engine import engine
 from sqlmodel import Session, select
 
 def find_all_courses():
+    """
+    Grabs all courses from the db if they exist
+
+    :return: list[CoursesModel]
+    """
     with Session(engine) as db:
         query = select(CoursesModel)
         results = db.exec(query).all()
@@ -13,6 +22,12 @@ def find_all_courses():
 
 
 def find_professor_courses_by_client_id(cid: int):
+    """
+    Find all professor's courses by the client id (professor id) passed.
+
+    :param cid:
+    :return:  list[CoursesModel]
+    """
     courses = []
     with Session(engine) as db:
         query = select(TeachingCoursesRegisteredModel, CoursesModel).join(CoursesModel
@@ -23,7 +38,14 @@ def find_professor_courses_by_client_id(cid: int):
             courses.append(course)
     return courses
 
+
 def find_student_courses_by_client_id(cid: int):
+    """
+    Find all students courses by the client id (students id)
+
+    :param cid:
+    :return: list[CoursesModel]
+    """
     courses = []
     with Session(engine) as db:
         query = select(CoursesRegisteredModel, CoursesModel).join(CoursesModel
@@ -36,12 +58,25 @@ def find_student_courses_by_client_id(cid: int):
 
 
 def find_course(cid: int):
+    """
+    Find course by id if it exists
+
+    :param cid:
+    :return: CoursesModel
+    """
     with Session(engine) as db:
         query = select(CoursesModel).where(CoursesModel.id == cid)
         result = db.exec(query).one_or_none()
         return result
 
+
 def find_course_students_by_id(cid: int):
+    """
+    Find all students in a course by the course id
+
+    :param cid:
+    :return: list[ClientModel]
+    """
     students = []
     with Session(engine) as db:
         query = select(CoursesRegisteredModel, ClientModel).join(ClientModel).where(CoursesRegisteredModel.course_id == cid)
@@ -51,6 +86,12 @@ def find_course_students_by_id(cid: int):
     return students
 
 def generate_and_store_course_access_code(cid: int):
+    """
+    Generate a random access code and update that courses access code by the course id if it exists
+
+    :param cid:
+    :return: str|None
+    """
     code = generate_random_string()
     course = find_course(cid)
     if course is not None:
@@ -62,9 +103,22 @@ def generate_and_store_course_access_code(cid: int):
 
     # with Session(engine) as db:
 def save(course: CoursesModel):
+    """
+    Saves a course to the database after changes were made (if any)
+
+    :param course:
+    :return: void
+    """
     with Session(engine) as db:
         db.add(course)
         db.commit()
 
+
 def generate_random_string(length: int = 8):
+    """
+    Generates a random string using python standard library
+
+    :param length:
+    :return: str
+    """
     return ''.join(random.choices(string.ascii_letters, k=length))

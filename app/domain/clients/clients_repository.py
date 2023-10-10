@@ -1,3 +1,7 @@
+### Contributors: Lamonte Harris
+### Description: Clients repository file used to grab data from the database based on the criteria we pass
+### to the functions
+
 import bcrypt
 from app.database.models import ClientModel
 from app.database.engine import engine
@@ -5,29 +9,7 @@ from app.sessions.auth_session_data import AuthSessionData
 from sqlmodel import Session, select
 
 
-def create_professor_models(total: int = 3):
-    return create_array_models("teacher", "Jane", "Doe", total, 2)
-
-
-def create_student_models(total: int = 15):
-    return create_array_models("student", "John", "Doe", total, 3)
-
-
-def create_array_models(email: str, name: str, lname: str, total: int, account_type: int):
-    models = []
-    t = 0
-    pw_salt = bcrypt.gensalt(rounds=15)
-    pw = bcrypt.hashpw(b"abc123", pw_salt)
-
-    while t <= total:
-        ln = "%s #%d" % (lname, t)
-        e = "%s%d@my.stlcc.edu" % (email, t)
-        models.append(ClientModel(email=e, password=pw, firstname=name, lastname=ln, account_type=account_type))
-        t += 1
-
-    return models
-
-# grabs all generated accounts in the datatabase
+### grabs all generated accounts in the database
 def find_all_accounts():
     with Session(engine) as db:
         query = select(ClientModel)
@@ -35,35 +17,69 @@ def find_all_accounts():
         return results
 
 
+### tries to find the account by email passed if one exists
 def find_account(email: str):
     with Session(engine) as db:
         query = select(ClientModel).where(ClientModel.email == email)
         result = db.exec(query).one_or_none()
         return result
 
-def find_account_by_id(id: int):
+
+def find_account_by_id(aid: int):
+    """
+    Tries to find an account by client id (client id can be for root, professors or students)
+
+    :param aid:
+    :return: ClientModel|None
+    """
     with Session(engine) as db:
-        query = select(ClientModel).where(ClientModel.id == id)
+        query = select(ClientModel).where(ClientModel.id == aid)
         result = db.exec(query).one_or_none()
         return result
 
+
 def find_by_session(data: AuthSessionData):
+    """
+    Tries to find account using the authenticated email session data passed
+
+    :param data:
+    :return: ClientModel|None
+    """
     user = find_account(data.email)
     if user is not None:
         return user
     return None
 
+
 def create_root_account():
+    """
+    This creates a client model object for the root account and stores it in the database using
+    :return: void
+    """
     pw = create_password("abc123")
 
     create_client_model(ClientModel(email="root", password=pw, firstname="root", lastname="root", account_type=1))
 
 
 def create_password(pw: str):
+    """
+    Creates a random password and returns the bcrypt hash that's salted
+
+    :param pw:
+    :return: str
+    """
     pw_salt = bcrypt.gensalt(rounds=15)
     return bcrypt.hashpw(pw.encode('utf-8'), pw_salt)
 
+
 def create_client_model(client: ClientModel):
+    """
+    Functional way to create a client model to be reused which
+    automatically stores the end point in the db
+
+    :param client:
+    :return: void
+    """
     with Session(engine) as db:
         db.add(client)
         db.commit()

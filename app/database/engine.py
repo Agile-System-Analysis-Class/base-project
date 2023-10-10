@@ -1,7 +1,12 @@
-from urllib.parse import quote_plus, quote
+### Contributors: Lamonte Harris
+### Description: Database engine file loads the local mysql credentials
+### then creates a connection object using the sqlmodel package which we will use
+### across the application to run our sql queries.
+
+from urllib.parse import quote
 
 from dotenv import dotenv_values
-from sqlmodel import create_engine, SQLModel, Session
+from sqlmodel import create_engine
 from . import models # don't remove this, it creates the tables autoloading them
 
 db_env = dotenv_values('app/.mysql.env')

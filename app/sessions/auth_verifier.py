@@ -1,3 +1,6 @@
+### Contributors: Lamonte Harris
+### Description: fastapi's way of handling session/cookie data - this is for verifying the session
+
 from uuid import UUID
 
 from fastapi import HTTPException

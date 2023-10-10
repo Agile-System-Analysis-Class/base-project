@@ -1,3 +1,6 @@
+### Contributors: Lamonte Harris
+### Description: fastapi's way of handling session/cookie data
+
 from pydantic import BaseModel, Field
 
 

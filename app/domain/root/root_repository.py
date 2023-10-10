@@ -1,3 +1,6 @@
+### Contributors: Lamonte Harris
+### Description: IT repository file used to perform generation data for the demo
+
 from app.database.models import ClientModel, CoursesModel, CoursesRegisteredModel, TeachingCoursesRegisteredModel
 from app.database.engine import engine
 from app.domain.clients.clients_repository import create_password
@@ -7,6 +10,11 @@ from app.domain.courses.courses_repository import find_all_courses
 
 
 def generate_demo_data():
+    """
+    Generates example data for the application to be used to test all it's features
+
+    :return: void
+    """
     with Session(engine) as db:
         # delete all users and courses that aren't root
         query = select(ClientModel).where(ClientModel.account_type != 1)

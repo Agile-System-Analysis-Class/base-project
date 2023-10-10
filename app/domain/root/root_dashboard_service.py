@@ -1,13 +1,24 @@
+### Contributors: Lamonte Harris
+### Description: Administrator service functions used to help generate demo data
+
 from app.database.models import ClientModel, CoursesModel, TeachingCoursesRegisteredModel, CoursesRegisteredModel
 
 
-# this function filters through the database fields instead of using join data
-# with existing data. Then we return an array of all the professors and the courses they're
-# assigned to.
 def filter_generated_data(accounts: list[ClientModel],
                           courses: list[CoursesModel],
                           course_data: list[TeachingCoursesRegisteredModel],
                           student_course_data: list[CoursesRegisteredModel]):
+    """
+    This function filters through the database fields instead of using join data with existing data.
+    Then we return an array of all the professors and the courses they're assigned to. which we use
+    To show the administrator what data is generated in the admin panel
+
+    :param accounts:
+    :param courses:
+    :param course_data:
+    :param student_course_data:
+    :return: list[dict]
+    """
     students_list = []
     for stud in accounts:
         if stud.account_type != 3:
@@ -46,7 +57,15 @@ def filter_generated_data(accounts: list[ClientModel],
 
     return professor_data
 
+
 def filter_course_by_id(course_id: int, courses: list[CoursesModel]):
+    """
+    Loop through list data to find course if it exists using user input
+
+    :param course_id:
+    :param courses:
+    :return: CoursesModel|None
+    """
     for course in courses:
         if course.id == course_id:
             return course
@@ -55,7 +74,16 @@ def filter_course_by_id(course_id: int, courses: list[CoursesModel]):
 
 def filter_students_by_course_id(course_id: int,
                                  students: list[ClientModel], course_data: list[CoursesRegisteredModel]):
-    # loop through the course model data so we can grab the students from that course
+    """
+    Used to loop through all course data and try to grab students for that course, so we can use it
+    later inn the administrator dashboard to display the generated data created in the dashboard
+
+    :param course_id:
+    :param students:
+    :param course_data:
+    :return: list[ClientModel]
+    """
+    # loop through the course model data, so we can grab the students from that course
     students_data = []
     for data in course_data:
         # ignore courses we don't want
@@ -68,6 +96,13 @@ def filter_students_by_course_id(course_id: int,
 
 
 def filter_students_by_student_id(student_id: int, students: list[ClientModel]):
+    """
+    Loop through list of students and find the student with the passed value if it exists
+
+    :param student_id:
+    :param students:
+    :return: ClientModel|None
+    """
     for student in students:
         if student.id == student_id:
             return student

@@ -1,6 +1,10 @@
+### Contributors: Lamonte Harris
+### Description: Database models file that represents objects paired to our database
+
 from typing import Optional
 from sqlmodel import SQLModel, Field
 
+# Database Client model that represents the IT, Professor & Student Accounts
 class ClientModel(SQLModel, table=True):
     __tablename__ = "clients"
 
@@ -11,6 +15,7 @@ class ClientModel(SQLModel, table=True):
     lastname: str
     account_type: int # 1 - root, 2 - professor, 3 - student
 
+# DB Courses model that represents courses for the class
 class CoursesModel(SQLModel, table=True):
     __tablename__ = "courses"
 
@@ -25,6 +30,7 @@ class CoursesModel(SQLModel, table=True):
     finish_date: Optional[int] = None
     meeting_start_time: Optional[int] = None
 
+# Db Courses Registered model, connects the professors to which courses they teach
 class CoursesRegisteredModel(SQLModel, table=True):
     __tablename__ = "courses_registered"
 
@@ -34,6 +40,7 @@ class CoursesRegisteredModel(SQLModel, table=True):
     grade: Optional[int] = None
     register_date: Optional[int] = None
 
+# Db Teach Courses Registered model, connects the professors to which courses they teach
 class TeachingCoursesRegisteredModel(SQLModel, table=True):
     __tablename__ = "teaching_courses_registered"
 
@@ -42,6 +49,7 @@ class TeachingCoursesRegisteredModel(SQLModel, table=True):
     course_id: int = Field(foreign_key="courses.id")
     register_date: Optional[int] = None
 
+# Db Attendance Model, keeps track of students attendance for a course
 class AttendanceModel(SQLModel, table=True):
     __tablename__ = "attendance"
 

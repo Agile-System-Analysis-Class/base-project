@@ -1,3 +1,7 @@
+### Contributors: Lamonte Harris
+### Description: We use this to create the session cookie locally and in the browser. but we only use the
+### local session for most of this application demo
+
 from uuid import uuid4
 
 from fastapi import Response

@@ -1,10 +1,11 @@
+### Contributors: Lamonte Harris
+### Description: We test our administrator generation functions to make sure they work.
+
 import unittest
 
 from app.database.models import ClientModel, CoursesModel, CoursesRegisteredModel
-
-from app.domain.root.root_dashboard_service import (filter_course_by_id, filter_students_by_student_id,
-                                                filter_students_by_course_id, filter_course_by_id)
-
+from app.domain.root.root_dashboard_service import (filter_students_by_student_id, filter_students_by_course_id,
+                                                    filter_course_by_id)
 
 class TestRootDashboardService(unittest.TestCase):
     def test_filter_course_by_id_has_course(self):
