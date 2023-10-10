@@ -18,6 +18,13 @@ app.mount("/website/app/assets", StaticFiles(directory="app/assets"), name="asse
 
 @app.middleware("http")
 async def disable_until_setup(request: Request, call_next):
+    """
+    Route middlewhere to check if we should tell the user if the site is setup or not
+
+    :param request:
+    :param call_next:
+    :return: Response
+    """
     if not request.url.path.startswith("/env_setup") and not is_setup_complete():
         return templates.TemplateResponse("setup.html", {"request": request})
 
