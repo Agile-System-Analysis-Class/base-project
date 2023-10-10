@@ -3,3 +3,5 @@ venv
 .env
 .mysql.env
 app/.setup_complete
+__pycache__/
+*.py[cod]

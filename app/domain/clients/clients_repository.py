@@ -9,16 +9,23 @@ from app.sessions.auth_session_data import AuthSessionData
 from sqlmodel import Session, select
 
 
-### grabs all generated accounts in the database
 def find_all_accounts():
+    """
+    Grabs all generated accounts in the database
+    :return: ClientModel|None
+    """
     with Session(engine) as db:
         query = select(ClientModel)
         results = db.exec(query).all()
         return results
 
 
-### tries to find the account by email passed if one exists
 def find_account(email: str):
+    """
+    Tries to find the account by email passed if one exists
+    :param email:
+    :return:
+    """
     with Session(engine) as db:
         query = select(ClientModel).where(ClientModel.email == email)
         result = db.exec(query).one_or_none()

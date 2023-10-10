@@ -29,6 +29,7 @@ def display_root_dashboard(request: Request, acct: ClientModel):
 
     return {"request": request, "data": data}
 
+
 def display_professor_dashboard(request: Request, acc: ClientModel):
     """
     This shows all the professors courses they are teaching this semester
@@ -39,6 +40,7 @@ def display_professor_dashboard(request: Request, acc: ClientModel):
     """
     courses = find_professor_courses_by_client_id(acc.id)
     return {"request": request, "courses": courses}
+
 
 def display_student_dashboard(request: Request, acc: ClientModel):
     """
