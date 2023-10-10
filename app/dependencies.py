@@ -1,3 +1,6 @@
+### Contributors: Lamonte Harris
+### Description: Dependencies that are included in multiple files
+
 from uuid import UUID
 
 from fastapi import HTTPException
@@ -8,13 +11,13 @@ from starlette.templating import Jinja2Templates
 from app.sessions.auth_session_data import AuthSessionData
 from app.sessions.auth_verifier import AuthVerifier
 
-# templates ob ject
+### templates object that ties our template files to the template engine
 templates = Jinja2Templates(directory="app/views")
 
-# setup session + backend cookies
+### setup session + backend cookies
 cookie_params = CookieParameters()
 
-# Uses UUID
+# + more cookies uses UUID
 cookie = SessionCookie(
     cookie_name="cookie",
     identifier="auth_verifier",
