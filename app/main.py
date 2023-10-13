@@ -15,7 +15,6 @@ app = FastAPI()
 # Setting up the statis directory to be served
 app.mount("/website/app/assets", StaticFiles(directory="app/assets"), name="assets")
 
-
 @app.middleware("http")
 async def disable_until_setup(request: Request, call_next):
     """

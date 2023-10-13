@@ -122,3 +122,19 @@ def generate_random_string(length: int = 8):
     :return: str
     """
     return ''.join(random.choices(string.ascii_letters, k=length))
+
+
+def debugger_save_course_start_data(course: CoursesModel, start_date: int, end_date: int, begin_hour: int):
+    """
+    Stores the debugger data we set for this course used to test the attendance data
+
+    :param course:
+    :param start_date:
+    :param end_date:
+    :param begin_hour:
+    :return:
+    """
+    course.start_date = start_date
+    course.finish_date = end_date
+    course.meeting_start_time = begin_hour
+    save(course)

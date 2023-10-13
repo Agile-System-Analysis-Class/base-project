@@ -34,3 +34,6 @@ verifier = AuthVerifier(
     backend=session,
     auth_http_exception=HTTPException(status_code=403, detail="invalid session"),
 )
+
+# root directory path
+ROOT_DIR = '/website/app'
