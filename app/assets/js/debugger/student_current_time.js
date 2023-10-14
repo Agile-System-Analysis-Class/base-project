@@ -15,7 +15,7 @@ $(function() {
         });
 });
 
-function set_course_start_data(cid) {
+function set_student_current_date(cid) {
     let current_date = $("#current_date").val();
     let set_min = $("#curr_min").val();
     let set_hour = $("#curr_hour").val();
@@ -26,14 +26,26 @@ function set_course_start_data(cid) {
         "set_min": set_min,
         "set_hour": set_hour,
     }, function(data) {
-        console.log(data)
-//        if(data.status) {
-//            // update access code input on completion
-//            showSuccessBlock("Access code updated successfully", 4, function() {
-//                window.location = "/teacher/course/" + cid + "/access_code";
-//            });
-//        } else {
-//            showErrorsBlock(data.message, 6);
-//        }
+        if(data.status) {
+            // update access code input on completion
+            showSuccessBlock("Current student time set successfully!", 2, function() {
+                window.location = "/student/course/" + cid;
+            });
+        } else {
+            showErrorsBlock(data.message, 6);
+        }
+    });
+}
+
+function clear_student_current_date(cid) {
+    $.post("/student/clear_current_time", function(data) {
+        if(data.status) {
+            // update access code input on completion
+            showSuccessBlock("Current student time reset successfully!", 2, function() {
+                window.location = "/student/course/" + cid;
+            });
+        } else {
+            showErrorsBlock(data.message, 6);
+        }
     });
 }

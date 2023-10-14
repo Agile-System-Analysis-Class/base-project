@@ -9,13 +9,16 @@
 
 <h2>Welcome to your course: {{ course.course_title }}</h2>
 
+<div class="errors-block" id="errors-block"></div>
+<div class="success-block" id="success-block"></div>
+
 <div class="debugger-container">
-    <h3>Student debugger settings</h3>
+    <h3>Student debugger settings - (Current Date/Time: <strong>{{ date }}</strong> )</h3>
     <div>
         <label>Set Current Day Date</label> <input type="text" id="current_date" value="{{ form.current_date }}" />
     </div>
     <div>
-        <label>Set Current Day hour/min (Current: <strong>TBD</strong> )</label>
+        <label>Set Current Day hour/min</label>
         <select id="curr_hour">
         {% for hour in form.hours %}
             <option{% if hour == form.selected_hour %} selected="selected"{% endif %}  value="{{ hour }}">{{ hour }}</option>
@@ -32,8 +35,8 @@
         </select>
     </div>
     <div>
-        <button onclick="set_course_start_data({{ course.id }});">Set</button>
-        <button onclick="clear_current_date({{ course.id }});">Clear</button>
+        <button onclick="set_student_current_date({{ course.id }});">Set</button>
+        <button onclick="clear_student_current_date({{ course.id }});">Clear</button>
     </div>
 </div>
 

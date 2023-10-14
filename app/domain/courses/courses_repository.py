@@ -86,6 +86,7 @@ def find_course_students_by_id(cid: int):
             students.append(client)
     return students
 
+
 def generate_and_store_course_access_code(cid: int):
     """
     Generate a random access code and update that courses access code by the course id if it exists

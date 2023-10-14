@@ -3,6 +3,10 @@
 from datetime import datetime
 import time
 
+import pytz
+from dateutil import tz
+from pytz import timezone
+
 
 def create_datetime_hours_list(as_string: bool = False):
     """Used to create a list of hours for drop down list"""
@@ -114,4 +118,30 @@ def convert_timestamp_to_form_begin_day(timestamp: int):
 def convert_timestamp_to_form_start_end_date(timestamp: int):
     """used to prefill unix-timestamp data into readable date data"""
     dt = datetime.fromtimestamp(timestamp)
+    if timestamp == 0:
+        dt = datetime.now()
+
     return dt.strftime("%m/%d/%Y")
+
+
+def create_student_override_date(timestamp: int):
+    """get current datetime if the user override, else return the current time"""
+    dt = datetime.fromtimestamp(timestamp)
+    dt = dt.replace(tzinfo=pytz.timezone('US/Central'))
+    now = datetime.now(pytz.timezone('US/Central'))
+    if timestamp == 0:
+        dt = now
+
+    hour = dt.hour
+    ampm = "am"
+    if dt.hour > 12:
+        hour = dt.hour - 12
+
+    if dt.hour >= 12:
+        ampm = "pm"
+
+    minute = f"{dt.minute}"
+    if dt.minute < 10:
+        minute = f"0{dt.minute}"
+
+    return "%d/%d/%d %d:%s %s" % (dt.month, dt.day, dt.year, hour, minute, ampm)
