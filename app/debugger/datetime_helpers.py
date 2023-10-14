@@ -115,11 +115,13 @@ def convert_timestamp_to_form_begin_day(timestamp: int):
     return "am"
 
 
-def convert_timestamp_to_form_start_end_date(timestamp: int):
+def convert_timestamp_to_form_start_end_date(timestamp: int, return_none: bool = False):
     """used to prefill unix-timestamp data into readable date data"""
     dt = datetime.fromtimestamp(timestamp)
     if timestamp == 0:
         dt = datetime.now()
+        if return_none is True:
+            return ""
 
     return dt.strftime("%m/%d/%Y")
 

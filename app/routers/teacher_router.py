@@ -47,13 +47,18 @@ async def teacher_course(
     form_hours = create_datetime_hours_list()
 
     # grab prefilled course begin hour/min/pm|am data
-    debug_pm = convert_timestamp_to_form_begin_day(course.meeting_start_time)
-    debug_course_min = convert_timestamp_to_form_begin_mins(course.meeting_start_time, form_mins)
-    debug_course_hour = convert_timestamp_to_form_begin_hours(course.meeting_start_time)
+    debug_pm = "am"
+    debug_course_min = 0
+    debug_course_hour = 0
+
+    if course.meeting_start_time > 0:
+        debug_pm = convert_timestamp_to_form_begin_day(course.meeting_start_time)
+        debug_course_min = convert_timestamp_to_form_begin_mins(course.meeting_start_time, form_mins)
+        debug_course_hour = convert_timestamp_to_form_begin_hours(course.meeting_start_time)
 
     # parse start/end dates
-    start_date_parsed = convert_timestamp_to_form_start_end_date(course.start_date)
-    finish_date_parsed = convert_timestamp_to_form_start_end_date(course.finish_date)
+    start_date_parsed = convert_timestamp_to_form_start_end_date(course.start_date, return_none=True)
+    finish_date_parsed = convert_timestamp_to_form_start_end_date(course.finish_date, return_none=True)
 
     return templates.TemplateResponse("teacher/course.html", {
         "request": request,

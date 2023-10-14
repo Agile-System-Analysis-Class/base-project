@@ -32,9 +32,9 @@ class CoursesModel(SQLModel, table=True):
     credit_hours: int
     capacity: int
     access_code: Optional[str] = None
-    start_date: Optional[int] = None
-    finish_date: Optional[int] = None
-    meeting_start_time: Optional[int] = None
+    start_date: Optional[int] = Field(default=0)
+    finish_date: Optional[int] = Field(default=0)
+    meeting_start_time: Optional[int] = Field(default=0)
 
 
 class CoursesRegisteredModel(SQLModel, table=True):
