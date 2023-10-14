@@ -71,4 +71,4 @@ class AttendanceModel(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     course_id: int
     client_id: int
-    date_marked_present: Optional[int] = None
+    date_marked_present: Optional[str] = Field(default="")

@@ -45,13 +45,21 @@
 <h3>Current Attendance</h3>
 <table border="1px">
     <tr>
-        <th width="5%">#</th>
         <th width="5%">Date</th>
         <th>Attended Class</th>
     </tr>
+    {% if not course_dates %}
     <tr>
         <td colspan="3"><em>Not implemented</em></td>
     </tr>
+    {% else %}
+    {% for date in course_dates %}
+    <tr>
+        <td>{{ date.date }} </td>
+        <td>{% if date.attended %}Attended{% endif %}</td>
+    </tr>
+    {% endfor %}
+    {% endif %}
 </table>
 
 {% endblock %}

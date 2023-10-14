@@ -15,6 +15,7 @@ from app.debugger.datetime_helpers import create_datetime_mins_list, create_date
 from app.dependencies import cookie, verifier, templates
 from app.domain.clients.clients_repository import find_account
 from app.domain.courses.courses_repository import find_course
+from app.domain.courses.courses_service import list_course_date_range, get_student_attendance_data
 from app.sessions.auth_session_data import AuthSessionData
 
 router = APIRouter()
@@ -53,6 +54,7 @@ async def student_course(
     debug_course_min = convert_timestamp_to_form_begin_mins(client.current_time_override, form_mins)
     debug_course_hour = convert_timestamp_to_form_begin_hours(client.current_time_override)
 
+    # default form field overrides
     if client.current_time_override == 0:
         debug_pm = "am"
         debug_course_min = -1
@@ -64,10 +66,14 @@ async def student_course(
     # parsed current time or overridden time we set in a readable sense converted to local timezone (central)
     current_date = create_student_override_date(client.current_time_override)
 
+    # parse course dates along w/ student attendance information
+    course_dates = get_student_attendance_data(course, client.id)
+
     return templates.TemplateResponse("student/course.html", {
         "date": current_date,
         "request": request,
         "course": course,
+        "course_dates": course_dates,
         "form": {
             "mins": form_mins,
             "hours": form_hours,
