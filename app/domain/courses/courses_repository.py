@@ -5,6 +5,7 @@
 import random
 import string
 
+from app.database.helpers import save
 from app.database.models import ClientModel, CoursesModel, CoursesRegisteredModel, TeachingCoursesRegisteredModel
 from app.database.engine import engine
 from sqlmodel import Session, select
@@ -99,19 +100,6 @@ def generate_and_store_course_access_code(cid: int):
         save(course)
         return code
     return None
-
-
-    # with Session(engine) as db:
-def save(course: CoursesModel):
-    """
-    Saves a course to the database after changes were made (if any)
-
-    :param course:
-    :return: void
-    """
-    with Session(engine) as db:
-        db.add(course)
-        db.commit()
 
 
 def generate_random_string(length: int = 8):

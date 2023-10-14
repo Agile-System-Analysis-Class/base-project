@@ -74,7 +74,6 @@ async def teacher_course(
 @router.post('/teacher/course_set_data/{cid}', dependencies=[Depends(cookie)])
 async def teacher_course_set_data(
     cid: int,
-    request: Request,
     start_date: Annotated[str, Form()],
     end_date: Annotated[str, Form()],
     set_day: Annotated[str, Form()],

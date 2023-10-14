@@ -1,9 +1,41 @@
 {% extends 'templates/base.html' %}
+{% block header_js %}
+{{ super() }}
+<script type="text/javascript" src="{{ url_for('assets', path='js/debugger/student_current_time.js') }}"></script>
+{% endblock %}
 {% block content %}
 
 {% include 'templates/nav.html' %}
 
 <h2>Welcome to your course: {{ course.course_title }}</h2>
+
+<div class="debugger-container">
+    <h3>Student debugger settings</h3>
+    <div>
+        <label>Set Current Day Date</label> <input type="text" id="current_date" value="{{ form.current_date }}" />
+    </div>
+    <div>
+        <label>Set Current Day hour/min (Current: <strong>TBD</strong> )</label>
+        <select id="curr_hour">
+        {% for hour in form.hours %}
+            <option{% if hour == form.selected_hour %} selected="selected"{% endif %}  value="{{ hour }}">{{ hour }}</option>
+        {% endfor %}
+        </select> :
+        <select id="curr_min">
+        {% for min in form.mins %}
+            <option{% if min == form.selected_min %} selected="selected"{% endif %} value="{{ min }}">{{ min }}</option>
+        {% endfor %}
+        </select>
+        <select id="curr_day">
+            <option value="am"{% if "am" == form.selected_pm %} selected="selected"{% endif %}>am</option>
+            <option value="pm"{% if "pm" == form.selected_pm %} selected="selected"{% endif %}>pm</option>
+        </select>
+    </div>
+    <div>
+        <button onclick="set_course_start_data({{ course.id }});">Set</button>
+        <button onclick="clear_current_date({{ course.id }});">Clear</button>
+    </div>
+</div>
 
 [<a href="/student/course/{{ course.id }}/checkin">Verify Attendance</a>]
 

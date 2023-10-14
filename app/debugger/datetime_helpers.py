@@ -60,6 +60,27 @@ def create_course_begin_timestamp(curr_hour: str, curr_min: str, curr_day: str):
         return False
 
 
+def create_student_timestamp(timestamp: int, curr_hour: str, curr_min: str, curr_day: str):
+    """This function creates a course timestamp that we'll use for every
+    course day between the start/end date which we'll create dates using only the hour/min data"""
+    plus = 0
+    if curr_day == "pm" and curr_hour != "12":
+        plus = 12
+
+    if curr_day == "am" and curr_hour == "12":
+        curr_hour = "0"
+
+    hour = int(curr_hour) + plus
+    dt = datetime.fromtimestamp(timestamp)
+
+    created = datetime(dt.year, dt.month, dt.day, hour, int(curr_min), 0)
+
+    try:
+        return datetime.strptime(f"{created}", "%Y-%m-%d %H:%M:%S").timestamp()
+    except ValueError:
+        return False
+
+
 def convert_timestamp_to_form_begin_mins(timestamp: int, mins: list):
     """Used to convert the course timestamp data into form data, so we can prefill input minute field"""
     dt = datetime.fromtimestamp(timestamp)

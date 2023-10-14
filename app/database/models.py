@@ -16,6 +16,7 @@ class ClientModel(SQLModel, table=True):
     firstname: str
     lastname: str
     account_type: int # 1 - root, 2 - professor, 3 - student
+    current_time_override: Optional[int] = Field(default=0)
 
 
 class CoursesModel(SQLModel, table=True):
