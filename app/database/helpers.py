@@ -1,11 +1,12 @@
 ### Contributors: Lamonte Harris
 ### Description: Database helpers are functions that we use to setup the database, as well as check if
-### the application was setup.
+### the application was set up.
 
 import os.path
 
-from sqlmodel import SQLModel
+from sqlmodel import SQLModel, Session
 from app.database.engine import engine
+from app.dependencies import ROOT_DIR
 from app.domain.clients.clients_repository import find_account, create_root_account
 
 ### We run this to set up all database tables and create root accounts
@@ -25,11 +26,18 @@ def setup_database_data():
         print("root created")
 
     """create setup file so we can't run this more than we need to"""
-    f = open(".setup_complete", "w+")
+    f = open(f"{ROOT_DIR}/.setup_complete", "w+")
     f.close()
 
 # helper function to check if setup file was created
 def is_setup_complete():
-    if os.path.isfile(".setup_complete"):
+    if os.path.isfile(f"{ROOT_DIR}/.setup_complete"):
         return True
     return False
+
+
+def save(obj):
+    """helper function to make saving objects to the db easier, so we're not repeating code"""
+    with Session(engine) as db:
+        db.add(obj)
+        db.commit()

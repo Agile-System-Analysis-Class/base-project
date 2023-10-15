@@ -1,9 +1,43 @@
 {% extends 'templates/base.html' %}
+{% block header_js %}
+{{ super() }}
+<script type="text/javascript" src="{{ url_for('assets', path='js/debugger/course.js') }}"></script>
+{% endblock %}
 {% block content %}
 
 {% include 'templates/nav.html' %}
 
 <h2>Welcome to your course: {{ course.course_number }} - {{ course.course_title }}</h2>
+
+<div class="debugger-container">
+    <h3>Course debugger settings</h3>
+    <div>
+        <label>Course Start Date</label> <input type="text" id="start_date" value="{{ form.start_date }}" />
+    </div>
+    <div>
+        <label>Course End Date</label> <input type="text" id="end_date" value="{{ form.finish_date }}" />
+    </div>
+    <div>
+        <label>Course Starts at</label>
+        <select id="begin_hour">
+        {% for hour in form.hours %}
+            <option{% if hour == form.selected_hour %} selected="selected"{% endif %}  value="{{ hour }}">{{ hour }}</option>
+        {% endfor %}
+        </select> :
+        <select id="begin_min">
+        {% for min in form.mins %}
+            <option{% if min == form.selected_min %} selected="selected"{% endif %} value="{{ min }}">{{ min }}</option>
+        {% endfor %}
+        </select>
+        <select id="begin_day">
+            <option value="am"{% if "am" == form.selected_pm %} selected="selected"{% endif %}>am</option>
+            <option value="pm"{% if "pm" == form.selected_pm %} selected="selected"{% endif %}>pm</option>
+        </select>
+    </div>
+    <div>
+        <button onclick="set_course_start_data({{ course.id }});">Save</button>
+    </div>
+</div>
 
 <a href="/teacher/course/{{ course.id }}/access_code">Access Code</a>
 

@@ -28,3 +28,10 @@
 .root-dashboard-generated-course-block .course-name {
     margin-bottom: 3px;
 }
+
+.debugger-container {
+    margin: 10px 0 10px 0;
+    padding: 0 5px 5px 5px;
+    border: 1px solid black;
+    max-width: 750px;
+}

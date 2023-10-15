@@ -16,6 +16,7 @@ class ClientModel(SQLModel, table=True):
     firstname: str
     lastname: str
     account_type: int # 1 - root, 2 - professor, 3 - student
+    current_time_override: Optional[int] = Field(default=0)
 
 
 class CoursesModel(SQLModel, table=True):
@@ -30,10 +31,10 @@ class CoursesModel(SQLModel, table=True):
     course_title: str
     credit_hours: int
     capacity: int
-    access_code: Optional[str] = None
-    start_date: Optional[int] = None
-    finish_date: Optional[int] = None
-    meeting_start_time: Optional[int] = None
+    access_code: Optional[str] = Field(default="")
+    start_date: Optional[int] = Field(default=0)
+    finish_date: Optional[int] = Field(default=0)
+    meeting_start_time: Optional[int] = Field(default=0)
 
 
 class CoursesRegisteredModel(SQLModel, table=True):
@@ -70,4 +71,4 @@ class AttendanceModel(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     course_id: int
     client_id: int
-    date_marked_present: Optional[int] = None
+    date_marked_present: Optional[str] = Field(default="")

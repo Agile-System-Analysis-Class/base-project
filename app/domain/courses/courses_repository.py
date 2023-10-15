@@ -5,6 +5,7 @@
 import random
 import string
 
+from app.database.helpers import save
 from app.database.models import ClientModel, CoursesModel, CoursesRegisteredModel, TeachingCoursesRegisteredModel
 from app.database.engine import engine
 from sqlmodel import Session, select
@@ -85,6 +86,7 @@ def find_course_students_by_id(cid: int):
             students.append(client)
     return students
 
+
 def generate_and_store_course_access_code(cid: int):
     """
     Generate a random access code and update that courses access code by the course id if it exists
@@ -101,19 +103,6 @@ def generate_and_store_course_access_code(cid: int):
     return None
 
 
-    # with Session(engine) as db:
-def save(course: CoursesModel):
-    """
-    Saves a course to the database after changes were made (if any)
-
-    :param course:
-    :return: void
-    """
-    with Session(engine) as db:
-        db.add(course)
-        db.commit()
-
-
 def generate_random_string(length: int = 8):
     """
     Generates a random string using python standard library
@@ -122,3 +111,19 @@ def generate_random_string(length: int = 8):
     :return: str
     """
     return ''.join(random.choices(string.ascii_letters, k=length))
+
+
+def debugger_save_course_start_data(course: CoursesModel, start_date: int, end_date: int, begin_hour: int):
+    """
+    Stores the debugger data we set for this course used to test the attendance data
+
+    :param course:
+    :param start_date:
+    :param end_date:
+    :param begin_hour:
+    :return:
+    """
+    course.start_date = start_date
+    course.finish_date = end_date
+    course.meeting_start_time = begin_hour
+    save(course)

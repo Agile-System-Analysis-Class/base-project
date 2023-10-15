@@ -1,22 +1,67 @@
 {% extends 'templates/base.html' %}
+{% block header_js %}
+{{ super() }}
+<script type="text/javascript" src="{{ url_for('assets', path='js/debugger/student_current_time.js') }}"></script>
+{% endblock %}
 {% block content %}
 
 {% include 'templates/nav.html' %}
 
 <h2>Welcome to your course: {{ course.course_title }}</h2>
 
-[<a href="/student/course/{{ course.id }}/checkin">Verify Attendance</a>]
+<div class="errors-block" id="errors-block"></div>
+<div class="success-block" id="success-block"></div>
+
+<div class="debugger-container">
+    <h3>Student debugger settings - (Current Date/Time: <strong>{{ date }}</strong> )</h3>
+    <div>
+        <label>Set Current Day Date</label> <input type="text" id="current_date" value="{{ form.current_date }}" />
+    </div>
+    <div>
+        <label>Set Current Day hour/min</label>
+        <select id="curr_hour">
+        {% for hour in form.hours %}
+            <option{% if hour == form.selected_hour %} selected="selected"{% endif %}  value="{{ hour }}">{{ hour }}</option>
+        {% endfor %}
+        </select> :
+        <select id="curr_min">
+        {% for min in form.mins %}
+            <option{% if min == form.selected_min %} selected="selected"{% endif %} value="{{ min }}">{{ min }}</option>
+        {% endfor %}
+        </select>
+        <select id="curr_day">
+            <option value="am"{% if "am" == form.selected_pm %} selected="selected"{% endif %}>am</option>
+            <option value="pm"{% if "pm" == form.selected_pm %} selected="selected"{% endif %}>pm</option>
+        </select>
+    </div>
+    <div>
+        <button onclick="set_student_current_date({{ course.id }});">Set</button>
+        <button onclick="clear_student_current_date({{ course.id }});">Clear</button>
+    </div>
+</div>
+
+{% if course_dates %}
+[<a href="/student/course/{{ course.id }}/attendance">Verify Attendance</a>]
+{% endif %}
 
 <h3>Current Attendance</h3>
 <table border="1px">
     <tr>
-        <th width="5%">#</th>
         <th width="5%">Date</th>
         <th>Attended Class</th>
     </tr>
+    {% if not course_dates %}
     <tr>
-        <td colspan="3"><em>Not implemented</em></td>
+        <td colspan="3"><em>Course not setup</em></td>
     </tr>
+    {% else %}
+    {% for date in course_dates %}
+    <tr>
+        <td>{{ date.date }} </td>
+        <td>{% if date.attended %}Attended{% endif %}</td>
+    </tr>
+    {% endfor %}
+    {% endif %}
 </table>
 
 {% endblock %}

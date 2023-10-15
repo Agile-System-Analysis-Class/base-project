@@ -1,0 +1,10 @@
+{% extends 'templates/base.html' %}
+{% block content %}
+
+{% include 'templates/nav.html' %}
+
+<h2>Welcome to your course: <a href="/student/course/{{ course.id }}">{{ course.course_number}} - {{ course.course_title }}</a></h2>
+
+<h3>Missed start window for course: {TIME}</h3>
+
+{% endblock %}

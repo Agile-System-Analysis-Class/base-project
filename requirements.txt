@@ -9,3 +9,4 @@ sqlmodel >= 0.0.8
 python-dotenv == 1.0.0
 mysqlclient >= 2.2.0
 bcrypt
+pandas
