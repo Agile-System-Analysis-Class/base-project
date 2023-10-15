@@ -20,6 +20,8 @@
 
 ## setting up & running the application
 
+- Note: delete `.setup_complete` when trying to nuke all the data else creating tables won't run
+
 - We need to spin up our environment, so run `docker-compose up -d` this will spin up your environment into a docker container and you can visit the website using `http://127.0.0.1:8000` - if things worked correctly you should be shown an error message.
 
 - (Note: Make sure the database is fully started before proceeding with this step.) Now you need to visit `http://127.0.0.1:8000/env_setup` - the first time you visit this page it will setp all database tables and creat the first admistrator account with the credentials `root:abc123`.
