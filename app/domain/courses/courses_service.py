@@ -1,4 +1,8 @@
-from app.database.models import AttendanceModel, CoursesModel
+from datetime import datetime
+
+import pytz
+
+from app.database.models import AttendanceModel, CoursesModel, ClientModel
 from app.debugger.datetime_helpers import convert_timestamp_to_form_start_end_date
 import pandas
 
@@ -61,3 +65,61 @@ def get_student_attendance_data(course: CoursesModel, student_id: int):
     attendance_dates = list_course_data_with_attendance_check(course_dates, attendance_data)
 
     return attendance_dates
+
+
+def course_has_attend_date(today: int, course: CoursesModel):
+    """USed to check if the current course has actual attend date"""
+    dt = convert_timestamp_to_form_start_end_date(today)
+
+    course_dates = list_course_date_range(course.start_date, course.finish_date)
+    if course_dates is None:
+        return False
+
+    if dt not in course_dates:
+        return False
+    return True
+
+
+def missed_course_attend_time(today: int, course: CoursesModel):
+
+    now = datetime.fromtimestamp(today)
+    if today == 0:
+        print("here")
+        now = datetime.now(pytz.timezone('US/Central'))
+
+    course_begin_time = datetime.fromtimestamp(course.meeting_start_time)
+
+    # course time must be same hour
+    if now.hour != course_begin_time.hour:
+        return True
+
+    # course minute must be within the start window
+    start_window_mins = 10
+
+    print(now.minute)
+    print(course_begin_time.minute)
+    """more readable than the version pycharm recommended"""
+    if now.minute >= course_begin_time.minute and now.minute <= course_begin_time.minute + start_window_mins:
+        return False
+    return True
+
+def student_course_checked_in(today: int, course: CoursesModel, client: ClientModel):
+    """Check if the student already checked into this course at the correct time"""
+    dt = convert_timestamp_to_form_start_end_date(today)
+
+    # check if the course is setup first, early exit
+    course_dates = list_course_date_range(course.start_date, course.finish_date)
+    if course_dates is None:
+        return False
+
+    # grab attendance data for this student and see if they already checked in
+    attendance_data = find_attendance_by_course_and_student_id(course.id, client.id)
+
+    attend_dates = []
+    for attend in attendance_data:
+        attend_dates.append(attend.date_marked_present)
+
+    if dt not in attend_dates:
+        return False
+
+    return True

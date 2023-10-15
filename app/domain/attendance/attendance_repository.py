@@ -20,3 +20,5 @@ def find_attendance_by_course_and_student_id(course_id: int, student_id: int):
         for (att, course) in results:
             attendance.append(att)
     return attendance
+
+

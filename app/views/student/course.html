@@ -40,7 +40,9 @@
     </div>
 </div>
 
-[<a href="/student/course/{{ course.id }}/checkin">Verify Attendance</a>]
+{% if course_dates %}
+[<a href="/student/course/{{ course.id }}/attendance">Verify Attendance</a>]
+{% endif %}
 
 <h3>Current Attendance</h3>
 <table border="1px">
@@ -50,7 +52,7 @@
     </tr>
     {% if not course_dates %}
     <tr>
-        <td colspan="3"><em>Not implemented</em></td>
+        <td colspan="3"><em>Course not setup</em></td>
     </tr>
     {% else %}
     {% for date in course_dates %}
