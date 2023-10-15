@@ -20,7 +20,7 @@
 
 ## setting up & running the application
 
-- Note: delete `.setup_complete` when trying to nuke all the data else creating tables won't run
+- Note: delete `.setup_complete` when rerunning this on an existing setup if you're trying to nuke all the data else creating tables won't run
 
 - We need to spin up our environment, so run `docker-compose up -d` this will spin up your environment into a docker container and you can visit the website using `http://127.0.0.1:8000` - if things worked correctly you should be shown an error message.
 
