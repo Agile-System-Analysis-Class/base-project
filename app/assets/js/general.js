@@ -19,6 +19,11 @@ function showSuccessBlock(message, duration = 10, wait = function(){}) {
     }, duration * 1000);
 }
 
+function hideMessageBlocks() {
+    $("#errors-block").slideUp("slow");
+    $("#success-block").slideUp("slow");
+}
+
 function showWaitingBlock(message, duration = 10, wait = function(){}) {
     $("#waiting-block").html(message).slideDown("slow");
     if(duration == 0) return;

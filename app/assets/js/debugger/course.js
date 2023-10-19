@@ -48,13 +48,13 @@ function set_course_start_data(cid) {
         "set_hour": set_hour,
     }, function(data) {
         console.log(data)
-//        if(data.status) {
-//            // update access code input on completion
-//            showSuccessBlock("Access code updated successfully", 4, function() {
-//                window.location = "/teacher/course/" + cid + "/access_code";
-//            });
-//        } else {
-//            showErrorsBlock(data.message, 6);
-//        }
+        if(data.status) {
+            // update access code input on completion
+            showSuccessBlock("Course data updated successfully!", 4, function() {
+                hideMessageBlocks();
+            });
+        } else {
+            showErrorsBlock(data.message, 6);
+        }
     });
 }
