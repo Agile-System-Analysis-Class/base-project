@@ -1,0 +1,16 @@
+{% extends 'templates/base.html' %}
+{% block content %}
+
+{% include 'templates/nav.html' %}
+
+<h2>Welcome to your course: <a href="/student/course/{{ course.id }}">{{ course.course_number}} - {{ course.course_title }}</a></h2>
+
+
+{% if title %}
+<h3>{{ title }}</h3>
+{% endif %}
+{% if message %}
+<p>{{ message }}</p>
+{% endif %}
+
+{% endblock %}

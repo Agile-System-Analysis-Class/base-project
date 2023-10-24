@@ -85,10 +85,12 @@ def create_student_timestamp(timestamp: int, curr_hour: str, curr_min: str, curr
         return False
 
 
-def convert_timestamp_to_form_begin_mins(timestamp: int, mins: list):
+def convert_timestamp_to_form_begin_mins(timestamp: int, mins: list, double_nums: bool = False):
     """Used to convert the course timestamp data into form data, so we can prefill input minute field"""
     dt = datetime.fromtimestamp(timestamp)
     if dt.minute in mins:
+        if double_nums and dt.minute < 10:
+            return f"0{dt.minute}"
         return dt.minute
     return None
 

@@ -40,9 +40,22 @@
     </div>
 </div>
 
-{% if course_dates %}
-[<a href="/student/course/{{ course.id }}/attendance">Verify Attendance</a>]
+{% if course.meeting_start_time > 0 %}
+<h3>Course Infomration</h3>
+<div>
+    Class start time: {{ current.course_hour }}:{{ current.course_min }}{{ current.course_pm }}
+</div>
 {% endif %}
+
+<div>
+{% if can_attend.can_attend %}
+[<a href="/student/course/{{ course.id }}/attendance">{{ can_attend.text }}</a>]
+{% else %}
+    {% if can_attend.text|length > 0 %}
+    [{{ can_attend.text }}]
+    {% endif %}
+{% endif %}
+</div>
 
 <h3>Current Attendance</h3>
 <table border="1px">

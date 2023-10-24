@@ -17,7 +17,7 @@ from app.dependencies import cookie, verifier, templates
 from app.domain.clients.clients_repository import find_account
 from app.domain.courses.courses_repository import find_course
 from app.domain.courses.courses_service import list_course_date_range, get_student_attendance_data, \
-    course_has_attend_date, student_course_checked_in, missed_course_attend_time
+    course_has_attend_date, student_course_checked_in, missed_course_attend_time, student_attend_show_text_or_link
 from app.sessions.auth_session_data import AuthSessionData
 
 router = APIRouter()
@@ -51,10 +51,15 @@ async def student_course(
     form_mins = create_datetime_mins_list()
     form_hours = create_datetime_hours_list()
 
-    # grab prefilled course begin hour/min/pm|am data
+    # grab prefilled current day hour/min/pm|am data
     debug_pm = convert_timestamp_to_form_begin_day(client.current_time_override)
     debug_course_min = convert_timestamp_to_form_begin_mins(client.current_time_override, form_mins)
     debug_course_hour = convert_timestamp_to_form_begin_hours(client.current_time_override)
+
+    # get course begin hour/min/pm|am data
+    current_pm = convert_timestamp_to_form_begin_day(course.meeting_start_time)
+    current_course_min = convert_timestamp_to_form_begin_mins(course.meeting_start_time, form_mins, True)
+    current_course_hour = convert_timestamp_to_form_begin_hours(course.meeting_start_time)
 
     # default form field overrides
     if client.current_time_override == 0:
@@ -71,11 +76,15 @@ async def student_course(
     # parse course dates along w/ student attendance information
     course_dates = get_student_attendance_data(course, client.id)
 
+    # grab user attended information
+    can_attend_and_text = student_attend_show_text_or_link(client, course)
+
     return templates.TemplateResponse("student/course.html", {
         "date": current_date,
         "request": request,
         "course": course,
         "course_dates": course_dates,
+        "can_attend": can_attend_and_text,
         "form": {
             "mins": form_mins,
             "hours": form_hours,
@@ -83,6 +92,11 @@ async def student_course(
             "selected_pm": debug_pm,
             "selected_min": debug_course_min,
             "selected_hour": debug_course_hour,
+        },
+        "current": {
+            "course_pm": current_pm,
+            "course_min": current_course_min,
+            "course_hour": current_course_hour,
         }
     })
 
@@ -115,17 +129,29 @@ async def student_course_attendance(
     # make sure course date actually exists before checking if they can check in
     course_attend_day_exists = course_has_attend_date(client.current_time_override, course)
     if not course_attend_day_exists:
-        return RedirectResponse(f"/student/course/{course.id}")
+        return templates.TemplateResponse("student/course_error.html", {
+            "request": request,
+            "course": course,
+            "title": "Invalid course attend date!",
+            "message": "No class on this date",
+        })
 
     is_attended = student_course_checked_in(client.current_time_override, course, client)
     if is_attended:
-        return RedirectResponse(f"/student/course/{course.id}")
+        return templates.TemplateResponse("student/course_error.html", {
+            "request": request,
+            "course": course,
+            "title": "Already attended",
+            "message": "You already checked into this course for the day!",
+        })
 
     # display different template if they missed attendance window
     if missed_course_attend_time(client.current_time_override, course):
-        return templates.TemplateResponse("student/course_attendance_missed.html", {
+        return templates.TemplateResponse("student/course_error.html", {
             "request": request,
             "course": course,
+            "title": "Missed attend window",
+            "message": "This course already started, you missed your attend window! Please contact your professor!",
         })
 
     return templates.TemplateResponse("student/course_attendance.html", {

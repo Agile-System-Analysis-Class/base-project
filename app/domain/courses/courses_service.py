@@ -103,6 +103,7 @@ def missed_course_attend_time(today: int, course: CoursesModel):
         return False
     return True
 
+
 def student_course_checked_in(today: int, course: CoursesModel, client: ClientModel):
     """Check if the student already checked into this course at the correct time"""
     dt = convert_timestamp_to_form_start_end_date(today)
@@ -123,3 +124,21 @@ def student_course_checked_in(today: int, course: CoursesModel, client: ClientMo
         return False
 
     return True
+
+
+def student_attend_show_text_or_link(client: ClientModel, course: CoursesModel):
+    """Used to show the verify button to check into the course if available/can"""
+    can_verify = True
+    can_verify_text = "Check into course"
+
+    if not course_has_attend_date(client.current_time_override, course):
+        can_verify = False
+        can_verify_text = ""
+    elif student_course_checked_in(client.current_time_override, course, client):
+        can_verify = False
+        can_verify_text = "Already Checked In"
+    elif missed_course_attend_time(client.current_time_override, course):
+        can_verify = False
+        can_verify_text = "Missed check in time"
+
+    return {"can_attend": can_verify, "text": can_verify_text}
