@@ -1,4 +1,4 @@
-function showErrorsBlock(message, duration = 10) {
+function showErrorsBlock(message, duration = 6) {
     $("#errors-block").html(message).slideDown("slow");
     setTimeout(function(){
         $("#errors-block").slideUp("slow", function() {
@@ -7,7 +7,7 @@ function showErrorsBlock(message, duration = 10) {
     }, duration * 1000);
 }
 
-function showSuccessBlock(message, duration = 10, wait = function(){}) {
+function showSuccessBlock(message, duration = 6, wait = function(){}) {
     $("#errors-block").hide();
     $("#waiting-block").hide();
     $("#success-block").html(message).slideDown("slow");
@@ -24,7 +24,7 @@ function hideMessageBlocks() {
     $("#success-block").slideUp("slow");
 }
 
-function showWaitingBlock(message, duration = 10, wait = function(){}) {
+function showWaitingBlock(message, duration = 6, wait = function(){}) {
     $("#waiting-block").html(message).slideDown("slow");
     if(duration == 0) return;
     setTimeout(function(){
