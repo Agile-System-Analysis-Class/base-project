@@ -15,7 +15,7 @@ def find_attendance_by_course_and_student_id(course_id: int, student_id: int):
 
     attendance = []
     with Session(engine) as db:
-        query = select(AttendanceModel, CoursesModel).where(ClientModel.id == student_id).where(CoursesModel.id == course_id)
+        query = select(AttendanceModel, CoursesModel).where(AttendanceModel.client_id == student_id).where(CoursesModel.id == course_id)
         results = db.exec(query)
         for (att, course) in results:
             attendance.append(att)
