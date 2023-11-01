@@ -2,21 +2,31 @@
 ### Description: These routes are used to transverse through the website, professor routes for
 ### viewing courses taught, viewing students registered, viewing attendance report data and, allowing
 ### the professor to set a access token for a course they taught.
+import json
 from datetime import datetime
-from typing import Annotated
+from io import StringIO
+from typing import Annotated, List
 
-from fastapi import APIRouter, Request, Depends, Form
+from fastapi import APIRouter, Request, Depends, Form, Query, Body
+from pydantic import BaseModel, Json
 from starlette.responses import RedirectResponse
 
 from app.debugger.datetime_helpers import create_datetime_hours_list, create_datetime_mins_list, verify_date, \
     create_course_begin_timestamp, convert_timestamp_to_form_begin_mins, convert_timestamp_to_form_begin_hours, \
     convert_timestamp_to_form_begin_day, convert_timestamp_to_form_start_end_date
 from app.dependencies import cookie, verifier, templates
+from app.domain.attendance.attendance_service import get_results
 from app.domain.courses.courses_repository import find_course, generate_and_store_course_access_code, \
     find_course_students_by_id, debugger_save_course_start_data
 from app.sessions.auth_session_data import AuthSessionData
 
 router = APIRouter()
+
+class StudentIdsModel(BaseModel):
+    student_ids: list | None = None
+
+class StudentIdsList(BaseModel):
+    student_ids: List[str]
 
 @router.get('/teacher/course/{cid}', dependencies=[Depends(cookie)])
 async def teacher_course(
@@ -74,6 +84,38 @@ async def teacher_course(
             "selected_hour": debug_course_hour,
         }
     })
+
+@router.post('/teacher/course/generate_report/{cid}', dependencies=[Depends(cookie)])
+async def teacher_attendance_result(
+    cid: int,
+    student_ids: Annotated[str, Form()],
+    sess: AuthSessionData = Depends(verifier)
+):
+    """
+    This route lists all the courses this professor teaches
+
+    :param request:
+    :param student_ids:
+    :param cid:
+    :param sess:
+    :return: Response
+    """
+    if not sess:
+        return {"status": False, "message": "not authenticated"}
+
+    course = find_course(cid)
+    if course is None:
+        return {"status": False, "message": "You don't teach this course"}
+
+    try:
+        ids = json.loads(student_ids)
+        results = get_results(ids, course)
+        if results is None:
+            return {"status": False, "message": "This course hasn't started yet. No attendance reports to show"}
+        else:
+            return {"status": True, "data": results}
+    except ValueError:
+        return {"status": False, "message": "error"}
 
 
 @router.post('/teacher/course_set_data/{cid}', dependencies=[Depends(cookie)])

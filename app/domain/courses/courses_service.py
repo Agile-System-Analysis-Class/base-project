@@ -1,3 +1,6 @@
+### Contributors: Lamonte Harris
+### Description: courses services that helps us bring together common functionality for courses
+
 from datetime import datetime
 
 import pytz
@@ -20,7 +23,9 @@ def list_course_date_range(start_date: int, finish_date: int):
     start_date_parsed = convert_timestamp_to_form_start_end_date(start_date, return_none=True)
     finish_date_parsed = convert_timestamp_to_form_start_end_date(finish_date, return_none=True)
 
-    dates = pandas.date_range(start=start_date_parsed, end=finish_date_parsed).strftime("%m/%d/%Y")
+    matches = pandas.date_range(start=start_date_parsed, end=finish_date_parsed).strftime("%m/%d/%Y")
+    for match in matches:
+        dates.append(match)
 
     return dates
 
@@ -46,6 +51,39 @@ def list_course_data_with_attendance_check(dates: list, attendance: list[Attenda
         dates_list.append({"date": date, "attended": attended})
 
     return dates_list
+
+
+def get_course_dates(course: CoursesModel):
+    """Get a list of dates for the current course"""
+    return list_course_date_range(course.start_date, course.finish_date)
+
+def get_course_dates_before_or_today(course: CoursesModel):
+    """Get a list of the actual course dates that has happened, exclude those that hasn't"""
+    actual = []
+    today = datetime.today()
+    course_dates = get_course_dates(course)
+    for date in course_dates:
+        date_parts = date.split("/", 3)
+
+        # only want 3 part dates, else something went wrong in the formatting
+        if len(date_parts) != 3:
+            continue
+
+        day = int(date_parts[1])
+        month = int(date_parts[0])
+        year = int(date_parts[2])
+
+        """we make sure all dates for the course are only the dates that happened so far in real
+        time, excluding days that hasn't actually happened yet."""
+        if year > today.year:
+            continue
+        elif year == today.year and month > today.month:
+            continue
+        elif year == today.year and month == today.month and day > today.day:
+            continue
+        else:
+            actual.append(date)
+    return actual
 
 
 def get_student_attendance_data(course: CoursesModel, student_id: int):
@@ -81,10 +119,9 @@ def course_has_attend_date(today: int, course: CoursesModel):
 
 
 def missed_course_attend_time(today: int, course: CoursesModel):
-
+    """check if the course check in time already ended in CST timezone"""
     now = datetime.fromtimestamp(today)
     if today == 0:
-        print("here")
         now = datetime.now(pytz.timezone('US/Central'))
 
     course_begin_time = datetime.fromtimestamp(course.meeting_start_time)
@@ -96,8 +133,6 @@ def missed_course_attend_time(today: int, course: CoursesModel):
     # course minute must be within the start window
     start_window_mins = 10
 
-    print(now.minute)
-    print(course_begin_time.minute)
     """more readable than the version pycharm recommended"""
     if now.minute >= course_begin_time.minute and now.minute <= course_begin_time.minute + start_window_mins:
         return False

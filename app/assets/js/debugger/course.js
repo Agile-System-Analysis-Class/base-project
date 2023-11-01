@@ -32,8 +32,11 @@ $(function() {
       }
       return date;
     }
+
+    reports_student_checkboxes();
 });
 
+/** function's used to set the course debug data */
 function set_course_start_data(cid) {
     let start_date = $("#start_date").val();
     let end_date = $("#end_date").val();

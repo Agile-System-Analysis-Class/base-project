@@ -18,6 +18,15 @@ class ClientModel(SQLModel, table=True):
     account_type: int # 1 - root, 2 - professor, 3 - student
     current_time_override: Optional[int] = Field(default=0)
 
+    def to_json(self):
+        return {
+            "id": self.id,
+            "email": self.email,
+            "firstname": self.firstname,
+            "lastname": self.lastname,
+            "name": f"{self.firstname} {self.lastname}",
+        }
+
 
 class CoursesModel(SQLModel, table=True):
     """

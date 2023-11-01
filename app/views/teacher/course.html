@@ -2,6 +2,7 @@
 {% block header_js %}
 {{ super() }}
 <script type="text/javascript" src="{{ url_for('assets', path='js/debugger/course.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('assets', path='js/teacher/generate_reports.js') }}"></script>
 {% endblock %}
 {% block content %}
 
@@ -45,15 +46,15 @@
 <a href="/teacher/course/{{ course.id }}/access_code">Access Code</a>
 
 <h3>Registered Students</h3>
-<table border="1px">
+<table border="1px" id="reports-table">
     <tr>
-        <th width="5%"># <input type="checkbox" /></th>
+        <th width="5%"># <input type="checkbox" name="check_all" id="check_all"/></th>
         <th>Student Name</th>
     </tr>
     {% if students %}
     {% for student in students %}
     <tr>
-        <td align="center"><input type="checkbox" /></td>
+        <td align="center"><input type="checkbox" name="reports[]" value="{{ student.id }}"/></td>
         <td>{{ student.firstname }} {{ student.lastname }}</td>
     </tr>
     {% endfor %}
@@ -63,8 +64,9 @@
     </tr>
     {% endif %}
     <tr>
-        <td colspan="3"><button onclick="alert('not implemented')">Generate Attendance Report</button></td>
+        <td colspan="3"><button onclick="reports_generate_student_attendance_report({{ course.id }})">Generate Attendance Report</button></td>
     </tr>
 </table>
 
+<div id="reports-results"></div>
 {% endblock %}
