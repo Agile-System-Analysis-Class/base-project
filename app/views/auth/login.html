@@ -1,24 +1,31 @@
 {% extends 'templates/auth.html' %}
-{% block header_js %}
+
+{# Contributors: Lamonte, Mike #}
+
+{% block javascript %}
 {{ super() }}
 <script type="text/javascript" src="{{ url_for('assets', path='js/auth/login.js') }}"></script>
-
 {% endblock %}
+
 {% block content %}
     <div class="form">
-        <div class="errors-block" id="errors-block"></div>
-        <div class="success-block" id="success-block"></div>
-        <div class="waiting-block" id="waiting-block"></div>
+
+        <div class="alert alert-danger errors-block" id="errors-block"></div>
+        <div class="alert alert-success success-block" id="success-block"></div>
+        <div class="alert alert-info waiting-block" id="waiting-block"></div>
+
         <form method="post" onsubmit="return attemptLogin();">
-            <div>
-                <label id="email" for="email">stlcc email</label>
-                <input type="text" name="email" value="{{ email }}" />
+            <div class="form-group mb-4">
+                <label id="email" for="email" class="form-label">stlcc email</label>
+                <input type="text" name="email" class="form-control" value="{{ email }}" />
+            </div>
+            <div class="form-group mb-4">
+                <label id="password" for="password" class="form-label">stlcc password</label>
+                <input type="password" name="password" class="form-control" value="{{ pw }}" />
             </div>
             <div>
-                <label id="password" for="password">stlcc password</label>
-                <input type="password" name="password" value="{{ pw }}" />
+                <input class="btn btn-primary" type="submit" name="submit" value="Login" />
             </div>
-            <input type="submit" name="submit" value="Login" />
         </form>
     </div>
 {% endblock %}

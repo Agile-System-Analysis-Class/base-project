@@ -1,11 +1,17 @@
+/* Contributors: Lamonte */
+
 /* login functions */
 function attemptLogin() {
 
     var email = $("#email").siblings("input[name='email']").val().trim();
     var password = $("#password").siblings("input[name='password']").val().trim();
-
+    console.log("pressed");
     if(email.length <= 0) {
-        showErrorsBlock("Username cannot be left blank");
+        showErrorsBlock("Email/Username cannot be left blank");
+        return false;
+    }
+    if(password.length <= 0) {
+        showErrorsBlock("Password cannot be left blank");
         return false;
     }
 
