@@ -20,9 +20,25 @@
     margin-bottom: 3px;
 }
 
-.debugger-container {
+/*.debugger-container {
     margin: 10px 0 10px 0;
     padding: 0 5px 5px 5px;
     border: 1px solid black;
     max-width: 750px;
+}*/
+
+.debugger-container {
+  margin-top: 20px;
+  border: 3px dashed lightgrey;
+}
+
+.debug-hm-width {
+    width: 60px;
+    display: inline;
+    margin-right: 5px;
+}
+
+table {
+  width: 100%;
+  margin-top: 20px;
 }

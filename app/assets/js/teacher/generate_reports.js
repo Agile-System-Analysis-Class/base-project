@@ -47,13 +47,17 @@ function create_reports_table(title, results) {
     }
     return `<div>
         <h3>Attendance Report</h3>
-        <table border="1px">
+        <table class="table">
+            <thead>
             <tr>
-                <th>Student Name</th>
-                <th>Days Attended</th>
-                <th>Days Attended (%)</th>
+                <th scope="col">Student Name</th>
+                <th scope="col">Days Attended</th>
+                <th scope="col">Days Attended (%)</th>
             </tr>
+            </thead>
+            <tbody>
             ${rows.join("")}
+            </tbody>
         </table>
     </div>`;
 }

@@ -1,17 +1,105 @@
 {% extends 'templates/base.html' %}
-{% block header_js %}
+{% block javascript %}
 {{ super() }}
 <script type="text/javascript" src="{{ url_for('assets', path='js/debugger/course.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('assets', path='js/teacher/generate_reports.js') }}"></script>
 {% endblock %}
-{% block content %}
+
+{%block content %}
+
+{% include 'templates/nav.html' %}
+
+<div class="container mt-5">
+    <h2>Welcome to your course: {{ course.course_number }} - {{ course.course_title }}</h2>
+
+    <div class="alert alert-danger errors-block" id="errors-block"></div>
+    <div class="alert alert-success success-block" id="success-block"></div>
+
+    <div class="debugger-container mb-4 p-2">
+        <h3>Course debugger settings</h3>
+        <div class="form-group mb-2">
+            <label for="start_date">Course Start Date</label>
+            <input type="text" class="form-control" id="start_date" value="{{ form.start_date }}" />
+        </div>
+        <div class="form-group mb-2">
+            <label for="end_date">Course End Date</label>
+            <input type="text" class="form-control" id="end_date" value="{{ form.finish_date }}" />
+        </div>
+        <div class="form-group mb-2">
+            <label for="begin_hour">Course Starts at</label>
+            <select class="form-control debug-hm-width" id="begin_hour">
+                {% for hour in form.hours %}
+                <option{% if hour == form.selected_hour %} selected="selected"{% endif %}  value="{{ hour }}">{{ hour }}</option>
+                {% endfor %}
+            </select>
+            <select class="form-control debug-hm-width" id="begin_min">
+                {% for min in form.mins %}
+                <option{% if min == form.selected_min %} selected="selected"{% endif %} value="{{ min }}">{{ min }}</option>
+                {% endfor %}
+            </select>
+            <select class="form-control debug-hm-width" id="begin_day">
+                <option value="am"{% if "am" == form.selected_pm %} selected="selected"{% endif %}>am</option>
+                <option value="pm"{% if "pm" == form.selected_pm %} selected="selected"{% endif %}>pm</option>
+            </select>
+        </div>
+        <div>
+            <button class="btn btn-primary" onclick="set_course_start_data({{ course.id }});">Save</button>
+        </div>
+    </div>
+
+    <div class="mb-4">
+        <a class="btn btn-secondary" href="/teacher/course/{{ course.id }}/access_code">Access Code</a>
+    </div>
+
+    <h3>Registered Students</h3>
+    <div class="mb-4">
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col" width="5%">
+                    # <input type="checkbox" name="check_all" id="check_all"/>
+                </th>
+                <th scope="col">Student Name</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% if students %}
+            {% for student in students %}
+            <tr>
+                <td scope="col"><input type="checkbox" name="reports[]" value="{{ student.id }}"/></td>
+                <td scope="col">{{ student.firstname }} {{ student.lastname }}</td>
+            </tr>
+            {% endfor %}
+            {% else %}
+            <tr>
+                <td colspan="3"><em>No users registered</em></td>
+            </tr>
+            {% endif %}
+            </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="2">
+                    <button class="btn btn-info" onclick="reports_generate_student_attendance_report({{ course.id }})">
+                        Generate Attendance Report
+                    </button>
+                </td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div id="reports-results"></div>
+</div>
+{% endblock %}
+
+{% block contentx %}
 
 {% include 'templates/nav.html' %}
 
 <h2>Welcome to your course: {{ course.course_number }} - {{ course.course_title }}</h2>
 
-<div class="errors-block" id="errors-block"></div>
-<div class="success-block" id="success-block"></div>
+<div class="errors-block" id="x-block"></div>
+<div class="success-block" id="xsuccess-block"></div>
 
 <div class="debugger-container">
     <h3>Course debugger settings</h3>

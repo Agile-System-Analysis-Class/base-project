@@ -1,5 +1,5 @@
 {% extends 'templates/base.html' %}
-{% block header_js %}
+{% block javascript %}
 {{ super() }}
 <script type="text/javascript" src="{{ url_for('assets', path='js/debugger/student_current_time.js') }}"></script>
 {% endblock %}
@@ -7,74 +7,80 @@
 
 {% include 'templates/nav.html' %}
 
-<h2>Welcome to your course: {{ course.course_title }}</h2>
+<div class="container mt-5">
+    <h2>Welcome to your course: {{ course.course_title }}</h2>
 
-<div class="errors-block" id="errors-block"></div>
-<div class="success-block" id="success-block"></div>
+    <div class="alert alert-danger errors-block" id="errors-block"></div>
+    <div class="alert alert-success success-block" id="success-block"></div>
 
-<div class="debugger-container">
-    <h3>Student debugger settings - (Current Date/Time: <strong>{{ date }}</strong> )</h3>
-    <div>
-        <label>Set Current Day Date</label> <input type="text" id="current_date" value="{{ form.current_date }}" />
+    <div class="debugger-container mb-4 p-2">
+        <h3>Student debugger settings - (Current Date/Time: <strong>{{ date }}</strong> )</h3>
+        <div class="form-group mb-2">
+            <label for="current_date">Set Current Day Date</label>
+            <input type="text" class="form-control" id="current_date" value="{{ form.current_date }}" />
+        </div>
+        <div class="form-group mb-2">
+            <label for="curr_hour">Set Current Day hour/min</label>
+            <select class="form-control debug-hm-width" id="curr_hour">
+            {% for hour in form.hours %}
+                <option{% if hour == form.selected_hour %} selected="selected"{% endif %}  value="{{ hour }}">{{ hour }}</option>
+            {% endfor %}
+            </select> :
+            <select class="form-control debug-hm-width" id="curr_min">
+            {% for min in form.mins %}
+                <option{% if min == form.selected_min %} selected="selected"{% endif %} value="{{ min }}">{{ min }}</option>
+            {% endfor %}
+            </select>
+            <select class="form-control debug-hm-width" id="curr_day">
+                <option value="am"{% if "am" == form.selected_pm %} selected="selected"{% endif %}>am</option>
+                <option value="pm"{% if "pm" == form.selected_pm %} selected="selected"{% endif %}>pm</option>
+            </select>
+        </div>
+        <div>
+            <button class="btn btn-primary" onclick="set_student_current_date({{ course.id }});">Set</button>
+            <button class="btn btn-secondary" onclick="clear_student_current_date({{ course.id }});">Clear</button>
+        </div>
     </div>
-    <div>
-        <label>Set Current Day hour/min</label>
-        <select id="curr_hour">
-        {% for hour in form.hours %}
-            <option{% if hour == form.selected_hour %} selected="selected"{% endif %}  value="{{ hour }}">{{ hour }}</option>
-        {% endfor %}
-        </select> :
-        <select id="curr_min">
-        {% for min in form.mins %}
-            <option{% if min == form.selected_min %} selected="selected"{% endif %} value="{{ min }}">{{ min }}</option>
-        {% endfor %}
-        </select>
-        <select id="curr_day">
-            <option value="am"{% if "am" == form.selected_pm %} selected="selected"{% endif %}>am</option>
-            <option value="pm"{% if "pm" == form.selected_pm %} selected="selected"{% endif %}>pm</option>
-        </select>
-    </div>
-    <div>
-        <button onclick="set_student_current_date({{ course.id }});">Set</button>
-        <button onclick="clear_student_current_date({{ course.id }});">Clear</button>
-    </div>
-</div>
 
-{% if course.meeting_start_time > 0 %}
-<h3>Course Infomration</h3>
-<div>
-    Class start time: {{ current.course_hour }}:{{ current.course_min }}{{ current.course_pm }}
-</div>
-{% endif %}
-
-<div>
-{% if can_attend.can_attend %}
-[<a href="/student/course/{{ course.id }}/attendance">{{ can_attend.text }}</a>]
-{% else %}
-    {% if can_attend.text|length > 0 %}
-    [{{ can_attend.text }}]
+    <h3>Course Infomration</h3>
+    {% if course.meeting_start_time > 0 %}
+    <div class="mb-4">
+        Class start time: {{ current.course_hour }}:{{ current.course_min }}{{ current.course_pm }}
+    </div>
     {% endif %}
-{% endif %}
-</div>
 
-<h3>Current Attendance</h3>
-<table border="1px">
-    <tr>
-        <th width="5%">Date</th>
-        <th>Attended Class</th>
-    </tr>
-    {% if not course_dates %}
-    <tr>
-        <td colspan="3"><em>Course not setup</em></td>
-    </tr>
+    <div class="mb-4">
+    {% if can_attend.can_attend %}
+        [<a href="/student/course/{{ course.id }}/attendance">{{ can_attend.text }}</a>]
     {% else %}
-    {% for date in course_dates %}
-    <tr>
-        <td>{{ date.date }} </td>
-        <td>{% if date.attended %}Attended{% endif %}</td>
-    </tr>
-    {% endfor %}
+        {% if can_attend.text|length > 0 %}
+        [{{ can_attend.text }}]
+        {% endif %}
     {% endif %}
-</table>
+    </div>
 
+    <h3>Current Attendance</h3>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th scope="col" width="10%">Date</th>
+            <th scope="col">Attended Class</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% if not course_dates %}
+            <tr>
+                <td colspan="3"><em>Course not setup</em></td>
+            </tr>
+            {% else %}
+            {% for date in course_dates %}
+            <tr>
+                <td>{{ date.date }} </td>
+                <td>{% if date.attended %}Attended{% endif %}</td>
+            </tr>
+            {% endfor %}
+            {% endif %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}

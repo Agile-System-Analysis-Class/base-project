@@ -3,14 +3,15 @@
 
 {% include 'templates/nav.html' %}
 
-<h2>Welcome to the Teacher Dashboard</h2>
+<div class="container mt-5">
+    <h2>Welcome to the Teacher Dashboard</h2>
 
-<h3>Courses</h3>
-
-<ul>
-    {% for course in courses %}
-    <li><a href="/teacher/course/{{ course.id }}">{{ course.course_number }} - {{ course.course_title }}</a></li>
-    {% endfor %}
-</ul>
+    <h3>Courses</h3>
+    <ul class="list-group">
+        {% for course in courses %}
+        <li class="list-group-item"><a href="/teacher/course/{{ course.id }}">{{ course.course_number }} - {{ course.course_title }}</a></li>
+        {% endfor %}
+    </ul>
+</div>
 
 {% endblock %}
