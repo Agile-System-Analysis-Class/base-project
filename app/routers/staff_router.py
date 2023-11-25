@@ -24,17 +24,16 @@ def report_center(request: Request, sess: AuthSessionData = Depends(verifier)):
     :param sess:
     :return: Response
     # """
-    # if not sess:
-    #     return RedirectResponse("/login")
-    #
-    # client = find_account(sess.email)
-    client = find_account("root")
+    if not sess:
+        return RedirectResponse("/login")
+
+    client = find_account(sess.email)
     if client is None:
         return RedirectResponse("/login")
 
-    # # only a root/staff account route
-    # if client.account_type != 1:
-    #     return RedirectResponse("/")
+    # only a root/staff account route
+    if client.account_type != 1:
+        return RedirectResponse("/")
 
     students = find_all_student_accounts()
 
@@ -56,15 +55,12 @@ async def report_center_results(
     :param sess:
     :return: Response
     """
-    # if not sess:
-    #     return {"status": False, "message": "not authenticated"}
+    if not sess:
+        return {"status": False, "message": "not authenticated"}
 
     try:
         ids = json.loads(student_ids)
         results = get_student_attendance_reports_by_ids(ids)
         return {"status": True, "data": results}
-        # if results is None:
-        #     return {"status": False, "message": "This course hasn't started yet. No attendance reports to show"}
-        # else:
     except ValueError:
         return {"status": False, "message": "error"}
