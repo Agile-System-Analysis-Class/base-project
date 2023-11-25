@@ -64,7 +64,6 @@ function create_reports_table(title, results) {
 
 /** create reports column data */
 function create_reports_column(name, attendance, percentage) {
-    console.log(name, attendance, percentage)
     return `<tr>
             <td>${name}</td>
             <td align="center">${attendance}</td>

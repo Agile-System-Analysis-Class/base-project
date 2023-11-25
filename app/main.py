@@ -7,7 +7,7 @@ from starlette.staticfiles import StaticFiles
 
 from app.database.helpers import is_setup_complete
 from app.dependencies import templates
-from app.routers import it_router, auth_router, teacher_router, student_router, dashboard_router
+from app.routers import it_router, auth_router, teacher_router, student_router, dashboard_router, staff_router
 
 # setup Fast API
 app = FastAPI()
@@ -36,3 +36,4 @@ app.include_router(auth_router.router)
 app.include_router(teacher_router.router)
 app.include_router(student_router.router)
 app.include_router(dashboard_router.router)
+app.include_router(staff_router.router)

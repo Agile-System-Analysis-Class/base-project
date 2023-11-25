@@ -1,3 +1,8 @@
+/**
+ * Contributors: Lamonte Harris
+ * Description: helper function for generating data in the root dashboard
+ */
+
 /* root dashboard functions */
 function rootGenerateWebsiteData() {
     showWaitingBlock("Waiting for data to generate", 0);

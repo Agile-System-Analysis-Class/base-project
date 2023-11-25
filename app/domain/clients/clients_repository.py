@@ -20,6 +20,17 @@ def find_all_accounts():
         return results
 
 
+def find_all_student_accounts():
+    """
+    Grabs all generated student accounts in the db
+    :return: ClientModel|None
+    """
+    with Session(engine) as db:
+        query = select(ClientModel).where(ClientModel.account_type == 3)
+        results = db.exec(query).all()
+        return results
+
+
 def find_account(email: str):
     """
     Tries to find the account by email passed if one exists

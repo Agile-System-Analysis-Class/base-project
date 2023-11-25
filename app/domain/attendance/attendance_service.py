@@ -33,7 +33,6 @@ def get_results(students: list[str], course: CoursesModel):
 
     course_dates = get_course_dates(course)
     course_dates_so_far = get_course_dates_before_or_today(course)
-    print(course_dates_so_far)
 
     # course hasn't started yet
     if len(course_dates_so_far) <= 0:

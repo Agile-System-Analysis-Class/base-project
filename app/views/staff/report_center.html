@@ -1,0 +1,51 @@
+{% extends 'templates/base.html' %}
+{% block javascript %}
+{{ super() }}
+<script type="text/javascript" src="{{ url_for('assets', path='js/root/report_center.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+{% include 'templates/nav.html' %}
+
+<div class="container mt-4">
+    <h2>Welcome to the Student Report Center</h2>
+
+    <div class="alert alert-danger errors-block" id="errors-block"></div>
+    <div class="alert alert-success success-block" id="success-block"></div>
+
+    <div class="mb-4">
+        <h3>Generate Reports</h3>
+        <strong>Students</strong>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">#id</th>
+                <th scope="col">Student Name (email)</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% if students and students|length > 0 %}
+            {% for student in students %}
+            <tr>
+                <td width="25px">
+                    <input type="checkbox" class="form-input" name="reports[]" value="{{ student.id }}" />
+                </td>
+                <td>{{ student.firstname }} {{ student.lastname }} ({{ student.email }})</td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td colspan="2"><button class="btn btn-secondary" onclick="report_center_generate_student_attendance_report()">Generate student reports</button></td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4"><em>No students generated</em></td>
+            </tr>
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <div id="reports-results"></div>
+</div>
+
+{% endblock %}

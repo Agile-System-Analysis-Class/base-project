@@ -27,7 +27,7 @@ def display_root_dashboard(request: Request, acct: ClientModel):
     data = filter_generated_data(accounts, courses, professor_course_data, student_course_data)
     # print(data)
 
-    return {"request": request, "data": data}
+    return {"request": request, "data": data,  "is_root": acct.account_type == 1}
 
 
 def display_professor_dashboard(request: Request, acc: ClientModel):

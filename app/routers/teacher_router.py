@@ -92,7 +92,7 @@ async def teacher_attendance_result(
     sess: AuthSessionData = Depends(verifier)
 ):
     """
-    This route lists all the courses this professor teaches
+    This route displays the attendance results when requested
 
     :param request:
     :param student_ids:
