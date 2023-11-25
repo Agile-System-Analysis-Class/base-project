@@ -60,8 +60,8 @@ def get_course_dates(course: CoursesModel):
 def get_course_dates_before_or_today(course: CoursesModel):
     """Get a list of the actual course dates that has happened, exclude those that hasn't"""
     actual = []
-    # today = datetime.today()
-    today = datetime(2023, 10, 15, 4, 15, 0)
+    today = datetime.today()
+    # today = datetime(2023, 10, 15, 4, 15, 0) # was use to test dates so far
     course_dates = get_course_dates(course)
     for date in course_dates:
         date_parts = date.split("/", 3)
